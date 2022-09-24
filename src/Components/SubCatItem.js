@@ -13,7 +13,8 @@ export default function Subcatitem({title}) {
 }
 const styles = StyleSheet.create({
     container : {
-        width : '10%',
-        marginHorizontal : 10
+        minWidth : '10%',
+        marginHorizontal : 10,
+        marginVertical : 10
     }
 })

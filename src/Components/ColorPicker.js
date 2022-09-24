@@ -1,110 +1,230 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-
-import Animated, {
-    color,
-    interpolateColor,
-    useAnimatedGestureHandler,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
-
-function ColorPicker({ colors, start, end, style, maxWidth, onColorChanged }) {
-    function randomIntFromInterval(min, max) {
-        // min and max included
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
-    // const translateX = useSharedValue(0); //! storing the previous Position
-    const translateX = useSharedValue(randomIntFromInterval(0, (maxWidth * (colors.length - 1)) / colors.length - CIRCLE_PICKER_SIZE));
-    // const translateY = useSharedValue(0);
-    // const scale = useSharedValue(1);
-
-    //! the adjustedTranslateX will be derived from translateX
-    const adjustedTranslateX = useDerivedValue(() => {
-        return Math.min(Math.max(translateX.value, 0), maxWidth - CIRCLE_PICKER_SIZE);
-    });
-
-    const panGestureHandler = useAnimatedGestureHandler({
-        //! handle pinch gesture, top gesture and pan Gesture
-        //! here we can access some callbacks
-        onStart: (_, context) => {
-            context.x = adjustedTranslateX.value;
-            // translateY.value = withSpring(-CIRCLE_PICKER_SIZE);
-            // scale.value = withSpring(1.2);
-        }, //! onStart callback
-        onActive: (event, context) => {
-            //! each callback have 2 params, context will share value onStart - onEnd
-            //! Active callback, we can access the Event
-            translateX.value = context.x + event.translationX;
-            console.log(`event Translation X: `, event.translationX); //! do luot
-        },
-        onEnd: () => {
-            // translateY.value = withSpring(0);
-            // scale.value = withSpring(1);
-        }, //! End callback
-    });
-
-    const rStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ translateX: adjustedTranslateX.value }],
-        };
-    }); //! reanimated Style
-
-    const rInternalPickerStyle = useAnimatedStyle(() => {
-        const inputRange = colors.map((_, index) => {
-            return (index / colors.length) * maxWidth;
-        });
-        // const backgroundColor = interpolateColor(translateX.value, inputRange, colors);
-        const backgroundColor = '#' + (interpolateColor(translateX.value, inputRange, colors) & 0x00ffffff).toString(16).padStart(6, '0');
-        // console.log(`colorCode: `, colorCode);
-        //! 2nd: Input Range
-        //! 3th: Output Range
-
-        onColorChanged?.(backgroundColor);
-
-        return {
-            backgroundColor: backgroundColor,
-        };
-    });
-
-    return (
-        <PanGestureHandler onGestureEvent={panGestureHandler}>
-            <Animated.View style={{ justifyContent: 'center' }}>
-                <LinearGradient colors={colors} start={start} end={end} style={style} />
-                <Animated.View style={[styles.picker, rStyle]}>
-                    <Animated.View style={[styles.internalPicker, rInternalPickerStyle]} />
-                </Animated.View>
-            </Animated.View>
-        </PanGestureHandler>
-    );
+import React, { useState, useEffect, useRef } from "react";
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { PanGestureHandler, TapGestureHandler, } from "react-native-gesture-handler";
+import { Button } from "@rneui/base";
+const SELECTION_RADIUS = 18;
+const COLORS = [
+    [255, 0, 0],
+    [255, 0, 255],
+    [0, 0, 255],
+    [0, 255, 255],
+    [0, 255, 0],
+    [255, 255, 0],
+    [255, 0, 0],
+];
+function mapColorNumToString(nums) {
+    return `rgb(${nums[0].toString()},${nums[1].toString()},${nums[2].toString()})`;
 }
+function calcLinear(scale, first, second) {
+    return first + scale * (second - first);
+}
+function getColor(x, colors) {
+    const indicesToVal = colors.map((_, index) => index / (colors.length - 1));
+    let upperIx = 0;
+    while (upperIx < indicesToVal.length && x > indicesToVal[upperIx])
+        upperIx += 1;
+    if (upperIx <= 0)
+        return colors[0];
+    if (upperIx >= indicesToVal.length)
+        upperIx = indicesToVal.length - 1;
+    const lowerIx = upperIx - 1;
+    const lowerColor = colors[lowerIx];
+    const upperColor = colors[upperIx];
+    const betweenScale = (x - indicesToVal[lowerIx]) /
+        (indicesToVal[upperIx] - indicesToVal[lowerIx]);
+    const newColor = [
+        calcLinear(betweenScale, lowerColor[0], upperColor[0]),
+        calcLinear(betweenScale, lowerColor[1], upperColor[1]),
+        calcLinear(betweenScale, lowerColor[2], upperColor[2]),
+    ];
+    return newColor;
+}
+const RgbColorPicker = ({ categoryname,containerStyle, barStyle,
+                        previewStyle, ballStyle, initialBaseSlider, 
+                        initialBase, onBaseSlider, onBase, initialColorSlider, 
+                        initialColor, onColorSlider, onColor, getColorFromColorPicker}) => {
+    const [width, setWidth] = useState(typeof containerStyle?.width === "number"
+        ? containerStyle.width
+        : 0);
+    const [height, setHeight] = useState(typeof containerStyle?.height === "number"
+        ? containerStyle.height
+        : 0);
+    const panBaseRef = useRef();
+    const tapBaseRef = useRef();
+    const panColorRef = useRef();
+    const tapColorRef = useRef();
+    const selectedBase = useRef(new Animated.Value(initialBaseSlider ? initialBaseSlider * width : 0)).current;
+    const [base, setBase] = useState(initialBase || [255, 0, 0]);
+    const selectedColor = useRef(new Animated.Value(0)).current;
+    const [colorSlide, setColorSlide] = useState(initialColorSlider ? initialColorSlider * width : 0);
+    const [color, setColor] = useState(initialColor || [0, 0, 0]);
 
-const CIRCLE_PICKER_SIZE = 35;
-const INTERNAL_PICKER_SIZE = CIRCLE_PICKER_SIZE / 2;
+
+    useEffect(() => {
+        getColorFromColorPicker(mapColorNumToString(color))
+    }, [color])
+    
+
+    useEffect(() => {
+        selectedBase.addListener(({ value }) => {
+            const newBaseSlide = value / width;
+            if (onBaseSlider)
+                onBaseSlider(newBaseSlide);
+            const newBase = getColor(newBaseSlide, COLORS);
+            if (onBase)
+                onBase(newBase);
+            setBase(newBase);
+            const newColor = getColor(colorSlide, [
+                [0, 0, 0],
+                newBase,
+                [255, 255, 255],
+            ]);
+            if (onColor)
+                onColor(newColor);
+            setColor(newColor);
+        });
+        selectedColor.addListener(({ value }) => {
+            const newColorSlide = value / width;
+            if (onColorSlider)
+                onColorSlider(newColorSlide);
+            setColorSlide(newColorSlide);
+            const newColor = getColor(newColorSlide, [
+                [0, 0, 0],
+                base,
+                [255, 255, 255],
+            ]);
+            if (onColor)
+                onColor(newColor);
+            setColor(newColor);
+        });
+        return () => {
+            selectedBase.removeAllListeners();
+            selectedColor.removeAllListeners();
+        };
+    }, [base, width]);
+    useEffect(() => {
+        if (width <= 0)
+            return;
+        selectedBase.setValue(initialBaseSlider ? initialBaseSlider * width : width * 0.5);
+        selectedColor.setValue(initialColorSlider ? initialColorSlider * width : width * 0);
+    }, [width]);
+    const setWithinBounds = (val, { x }) => {
+        val.setValue(Math.max(Math.min(x, width), 0));
+    };
+    return (React.createElement(View, { style: containerStyle },
+        // React.createElement(View, { style: [
+        //         previewStyle,
+        //         {
+        //             backgroundColor: mapColorNumToString(color),
+        //         },
+        //     ] }),
+        React.createElement(PanGestureHandler, { ref: panBaseRef, onGestureEvent: (e) => {
+                setWithinBounds(selectedBase, e.nativeEvent);
+            }, simultaneousHandlers: [tapBaseRef] },
+            React.createElement(TapGestureHandler, { ref: tapBaseRef, onHandlerStateChange: (e) => {
+                    setWithinBounds(selectedBase, e.nativeEvent);
+                }, simultaneousHandlers: [panBaseRef] },
+                React.createElement(View, { style: barStyle, onLayout: (e) => {
+                        setWidth(e.nativeEvent.layout.width);
+                        setHeight(e.nativeEvent.layout.height);
+                    } },
+                    React.createElement(LinearGradient, { start: { x: 0, y: 0.5 }, locations: COLORS.map((_, index) => index / (COLORS.length - 1)), end: { x: 1, y: 0.5 }, colors: COLORS.map((colorNum) => mapColorNumToString(colorNum)), style: {
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 8,
+                        } }),
+                    React.createElement(Animated.View, { style: [
+                            ballStyle,
+                            {
+                                borderColor: "black",
+                                backgroundColor: mapColorNumToString(base),
+                            },
+                            {
+                                transform: [
+                                    { translateX: selectedBase },
+                                    { translateX: -SELECTION_RADIUS },
+                                    { translateY: height / 2 - SELECTION_RADIUS },
+                                ],
+                            },
+                        ] })))),
+        React.createElement(PanGestureHandler, { ref: panColorRef, onGestureEvent: (e) => {
+                setWithinBounds(selectedColor, e.nativeEvent);
+            }, simultaneousHandlers: [tapColorRef] },
+            React.createElement(TapGestureHandler, { ref: tapColorRef, onHandlerStateChange: (e) => {
+                    setWithinBounds(selectedColor, e.nativeEvent);
+                }, simultaneousHandlers: [panColorRef] },
+                React.createElement(View, { style: barStyle },
+                    React.createElement(LinearGradient, { start: { x: 0, y: 0.5 }, locations: [0, 0.5, 1], end: { x: 1, y: 0.5 }, colors: [
+                            "rgb(0,0,0)",
+                            mapColorNumToString(base),
+                            "rgb(255,255,255)",
+                        ], style: { width: "100%", height: "100%", borderRadius: 8 } }),
+                    React.createElement(Animated.View, { style: [
+                            ballStyle,
+                            {
+                                borderColor: selectedColor.interpolate({
+                                    inputRange: [0, width],
+                                    outputRange: ["#FFF", "#000"],
+                                }),
+                                backgroundColor: mapColorNumToString(color),
+                            },
+                            {
+                                transform: [
+                                    { translateX: selectedColor },
+                                    { translateX: -SELECTION_RADIUS },
+                                    { translateY: height / 2 - SELECTION_RADIUS },
+                                ],
+                            },
+                        ] })))),
+        <View style={[styles.btnChooseColor,{backgroundColor : mapColorNumToString(color)}]}>
+            <Text style={styles.txtChooseColor}>{categoryname}</Text></View>,
+                        ));
+};
+RgbColorPicker.defaultProps = {
+    containerStyle: {
+        justifyContent: "center",
+        alignItems: "center",
+        width: 300,
+    },
+    previewStyle: {
+        width: 200,
+        height: 100,
+        borderRadius: 20,
+        marginVertical: 8,
+        // borderWidth: 2,
+        borderColor: "black",
+    },
+    barStyle: {
+        width: "100%",
+        height: 32,
+        marginVertical: 8,
+    },
+    ballStyle: {
+        width: SELECTION_RADIUS * 2,
+        height: SELECTION_RADIUS * 2,
+        borderRadius: SELECTION_RADIUS,
+        backgroundColor: "black",
+        position: "absolute",
+        borderWidth: 2,
+        borderColor: "white",
+    },
+};
 
 const styles = StyleSheet.create({
-    picker: {
-        position: 'absolute',
-        // backgroundColor: '#fff',
-        backgroundColor: '#f0f0f0',
-        width: CIRCLE_PICKER_SIZE,
-        height: CIRCLE_PICKER_SIZE,
-        borderRadius: CIRCLE_PICKER_SIZE / 2,
-        justifyContent: 'center',
-        alignItems: 'center',
+    btnChooseColor : {
+        marginTop : 20,
+        width : 270,
+        height : 50,
+        borderRadius : 15,
+        justifyContent : "center",
+        alignItems : "center"
     },
-    internalPicker: {
-        width: INTERNAL_PICKER_SIZE,
-        height: INTERNAL_PICKER_SIZE,
-        borderRadius: INTERNAL_PICKER_SIZE / 2,
-        borderWidth: 1.0,
-        borderColor: 'rgba(0,0,0,0.2)',
+    txtChooseColor : {
+        fontSize : 16,
+        fontWeight : "bold",
+        color : '#2d3436'
     },
-});
 
-export default ColorPicker;
+})
+export { RgbColorPicker };

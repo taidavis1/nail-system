@@ -5,16 +5,18 @@ export const categorySlice = createSlice({
   name: 'category',
   initialState : {
     items : [],
-    currentCategory : ''
+    currentCategory : '',
+    choosedColor : ''
   },
   reducers: {
     addCategory: (state,action) => {
       const {id} = action.payload
         state.currentCategory = id
       },
-    addListCategory : (state,payload) => {
-      state.items = [...payload.data]
-    }
+    addListCategory : (state,action) => {
+      state.items = action.payload.data
+    },
+
   },
 })
 

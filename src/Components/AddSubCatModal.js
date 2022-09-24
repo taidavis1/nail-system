@@ -6,23 +6,25 @@ import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
 import  { RgbColorPicker } from './ColorPicker';
 import CategoryServices from '../Services/CategoryServices';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-export default function Addcategorymodal({ onPress, isVisible }) {
-    const [catagoryName, setCatagoryName] = useState()
-    const [chooseColor, setChooseColor] = useState()
+export default function Addsubcatmodal({ onPress, isVisible }) {
+    const [subCatName, setSubCatName] = useState()
+    const currentCategoryID = useSelector(state => state.category.currentCategory)
     const getInputValue = (value) => {
-        setCatagoryName(value)
+        setSubCatName(value)
     }
     const clickSave = () => {
-        CategoryServices.addCategory(catagoryName,chooseColor).then(
+        axios.post('http://127.0.0.1:5000/Add_Subcat',{
+            name : subCatName,
+            category : currentCategoryID,
+            services : []
+        }).then(
             res => {
                 console.log(res)
-                onPress()
-            }
-        ).catch(err => console.log(err))
-    }
-    const getColor = (value) => {
-        setChooseColor(value)
+                onPress()  }      
+            ).catch(err => console.log(err))
     }
 
     return (
@@ -30,16 +32,9 @@ export default function Addcategorymodal({ onPress, isVisible }) {
 
             <ReactNativeModal isVisible={isVisible} style={styles.modalContainer} backdropOpacity={0.3}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>Add New Category</Text>
+                    <Text style={styles.title}>Add New SubCat</Text>
                     <View style={styles.inputContainer}>
-                        <Forminput label={'Category Name'} help={'Example'} onChange={(value) => getInputValue(value)}/>
-                    </View>
-                    <View style={styles.colorContainer}>
-                        <View style={styles.colorPicker}>
-                        <Text style={styles.colorTitle}>Pick Color :</Text>
-                        </View>
-                        <RgbColorPicker categoryname = {catagoryName}  
-                                        getColorFromColorPicker={(value) => getColor(value)}/>
+                        <Forminput label={'SubCategory Name'} help={'Example'} onChange={(value) => getInputValue(value)}/>
                     </View>
                     <View style={styles.btnContainer}>
                         <View>
@@ -64,7 +59,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     container: {
-        flex: 0.7,
+        flex: 0.3,
         backgroundColor: 'white',
         width: '70%',
         // justifyContent: 'center',
@@ -91,20 +86,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    colorContainer : {
-        flex : 1,
-        width : '100%',
-        // justifyContent : 'center',
-        alignItems : 'center',
-        marginTop : 50
-    },
-    colorTitle : {
-        color : 'green',
-        fontWeight : 'bold',
-        fontSize : 16
-    },
-    colorPicker :{
-        width : '70%',
-        marginBottom : 15
-    }
+
+
 })
