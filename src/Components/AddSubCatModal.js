@@ -4,9 +4,7 @@ import ReactNativeModal from 'react-native-modal'
 import { Button } from "@rneui/themed";
 import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
-import  { RgbColorPicker } from './ColorPicker';
 import CategoryServices from '../Services/CategoryServices';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 
 export default function Addsubcatmodal({ onPress, isVisible }) {
@@ -16,15 +14,7 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
         setSubCatName(value)
     }
     const clickSave = () => {
-        axios.post('http://127.0.0.1:5000/Add_Subcat',{
-            name : subCatName,
-            category : currentCategoryID,
-            services : []
-        }).then(
-            res => {
-                console.log(res)
-                onPress()  }      
-            ).catch(err => console.log(err))
+        onPress()
     }
 
     return (

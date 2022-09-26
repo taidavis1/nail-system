@@ -1,46 +1,36 @@
 import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler'
+import { FlatList, ScrollView } from 'react-native-gesture-handler'
 import Categoryitem from '../Components/CategoryItem'
 import HeaderBase from '../Components/HeaderBase';
 import Addcategorymodal from '../Components/AddCategoryModal';
 import Subcatitem from '../Components/SubCatItem'
-import CategoryServices from '../Services/CategoryServices'
+
 import { useDispatch, useSelector } from 'react-redux'
-import { addCategory, addListCategory } from '../store/slices/category'
-import {  Icon} from '@rneui/base'
+import { Icon } from '@rneui/base'
 import Addsubcatmodal from '../Components/AddSubCatModal';
+import { fetchCategory } from '../store/slices/Category/categoryAction';
+import { addCurrentCategoryID } from '../store/slices/Category/categorySlice';
+import Servicecontainer from '../Components/ServiceContainer';
 
 export default function Servicescreen(props) {
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [isVisible_SubCat, setisVisible_SubCat] = useState(false)
-    // const [categoryData, setCategory] = useState([])
 
     const dispatch = useDispatch()
 
-    const listCategoryFromStore = useSelector(state => state.category.items)
+    const listCategoryFromStore = useSelector(state => state.category.category)
     const currentCategoryID = useSelector(state => state.category.currentCategory)
-    const currentCategoryData = listCategoryFromStore.filter(item => item.id === currentCategoryID)[0]
-    const SubCatdata = currentCategoryData?.subCategories
+    const SubCatdata = listCategoryFromStore?.filter(item => item.id === currentCategoryID)[0]?.subCategories
 
     useEffect(() => {
-        CategoryServices.getCategory().then(
-            res => {
-                // setCategory(res)
-                dispatch(addListCategory({data : res}))
-                
-                if (currentCategoryID === ''){
-                    dispatch(addCategory({id : res[0].id}))
-                }
-                
-            }
-        ).catch(err => console.log(err))
-    }, [dispatch,isModalVisible,isVisible_SubCat])
+        dispatch(fetchCategory({currentCategoryID : currentCategoryID}))
+    }, [dispatch, isModalVisible, isVisible_SubCat])
 
     const renderCategoryItem = ({ item }) => {
         return <Categoryitem categoryname={item.category_name} color={item.color} id={item.id}
-        clickCategory={(categoryname,id) => clickCategory(categoryname,id)}/>
+            clickCategory={(categoryname, id) => clickCategory(categoryname, id)} />
     }
 
     const toggleModal = () => {
@@ -50,14 +40,13 @@ export default function Servicescreen(props) {
         setisVisible_SubCat(!isVisible_SubCat)
     }
 
-    const clickCategory = (categoryname,id) => {
+    const clickCategory = (categoryname, id) => {
         switch (categoryname) {
             case 'Add new Category':
                 toggleModal()
                 break;
-                
             default:
-                dispatch(addCategory({id}))
+                dispatch(addCurrentCategoryID({id}))
                 break;
         }
     }
@@ -70,7 +59,7 @@ export default function Servicescreen(props) {
     return (
         <View style={styles.container}>
             <Addcategorymodal isVisible={isModalVisible} onPress={toggleModal} />
-            <Addsubcatmodal isVisible={isVisible_SubCat} onPress={toggleModal_SubCat}/>
+            <Addsubcatmodal isVisible={isVisible_SubCat} onPress={toggleModal_SubCat} />
             <HeaderBase screenName={'Service'} />
             <View style={styles.wrapper}>
 
@@ -80,21 +69,22 @@ export default function Servicescreen(props) {
                         renderItem={renderCategoryItem}
                         keyExtractor={(item) => item.id}
                         showsHorizontalScrollIndicator={false} />
-                    <Categoryitem categoryname={'All Category'} color={'#dfe6e9'} clickCategory={(categoryname,id) => clickCategory(categoryname,id)} id={'all'}/>
-                    <Categoryitem categoryname={'Add new Category'} color={'#b2bec3'} clickCategory={(categoryname,id) => clickCategory(categoryname,id)} id={'add-cat'}/>
+                    <Categoryitem categoryname={'All Category'} color={'#dfe6e9'} clickCategory={(categoryname, id) => clickCategory(categoryname, id)} id={'all'} />
+                    <Categoryitem categoryname={'Add new Category'} color={'#b2bec3'} clickCategory={(categoryname, id) => clickCategory(categoryname, id)} id={'add-cat'} />
                 </View>
                 <View style={styles.subCatContainer}>
                     <View style={styles.subCatItem}>
-                        <View style={styles.subCatItemLeft}>
-                        {SubCatdata?.map(
+                        <ScrollView style={styles.subCatItemLeft}
+                            horizontal={true}>
+                            {SubCatdata?.map(
                             (item) => <Subcatitem title={item.name} key={item.id}/>
                         )}
-                        </View>
+                        </ScrollView>
                         <TouchableOpacity style={styles.addSubCatContainer}
-                            onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat}/></TouchableOpacity>
+                            onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
-
+                        <Servicecontainer/>
                     </View>
                 </View>
             </View>
@@ -125,28 +115,29 @@ const styles = StyleSheet.create({
     subCatItem: {
         // flex: 1,
         backgroundColor: '#dfe6e9',
-        flexDirection : 'row',
-        alignItems : 'center',
-        justifyContent : 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         // minHeight : 10
     },
     subCatServices: {
-        flex: 9
+        flex: 9,
+        // flexDirection : 'row'
     },
-    subCatItemLeft : {
-        flexDirection : 'row',
-        flexWrap : 'wrap',
-        width : '90%'
+    subCatItemLeft: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        width: '90%'
     },
-    addSubCatContainer :{
-        backgroundColor : '#63cdda',
-        marginRight : 10,
-        borderRadius : 10,
-        marginVertical : 10
+    addSubCatContainer: {
+        backgroundColor: '#63cdda',
+        marginHorizontal: 10,
+        borderRadius: 10,
+        marginVertical: 10
     },
-    addSubCat : {
-        padding : 5,
-        
+    addSubCat: {
+        padding: 5,
+
     }
 
 })
