@@ -27,7 +27,8 @@ export default function Addservicemodal({ onPress, isVisible }) {
     const [image, setImage] = useState(null);
     const [testImg, settestImg] = useState()
     const [isVisibleBottomSheet, setIsVisibleBottomSheet] = useState(false);
-    const [defaultValueCategory, setdefaultValueCategory] = useState(currentCategory)
+    const [defaultValueCategory, setdefaultValueCategory] = useState(currentCategory);
+    const [fileName, setFileName] = useState()
 
     const getInputValue = (value) => {
         setName(value)
@@ -48,7 +49,8 @@ export default function Addservicemodal({ onPress, isVisible }) {
             quality: 1,
         });
 
-        console.log(result)
+        console.log(result);
+        setFileName(result.fileName);
 
         if (!result.cancelled) {
             setImage(result.uri);
@@ -60,22 +62,58 @@ export default function Addservicemodal({ onPress, isVisible }) {
         setIsVisibleBottomSheet(true)
     }
 
+    // const handleTestImg = () => {
+    //     axios.post('http://127.0.0.1:5000/Add_services', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //         body: {
+    //             displayName: 'testDisplay',
+    //             name: 'testname',
+    //             price: '2000',
+    //             commission: 'testcommision',
+    //             color: 'red',
+    //             // photo: image,
+    //             category: '1',
+    //             subcat: '1'
+    //         }
+    //     }).then(
+    //         res => console.log(res)
+    //     ).catch(
+    //         err => console.log(err)
+    //     )
+    // }
     const handleTestImg = () => {
-        axios.post('http://127.0.0.1:5000/Add_services',{
-            displayName : 'testDisplay',
-            name : 'testname',
-            price : '2000',
-            commission : 'testcommision',
-            color : 'red',
-            photo : image,
-            category : '1',
-            subcat : '1'
-        }).then(
-            res => console.log(res)
-        ).catch(
-            err => console.log(err)
-        )
+        let formData = new FormData();
+        formData.append('displayName', 'testDisplay');
+        formData.append('name', 'testName_1');
+        formData.append('price', '2000');
+        formData.append('commission', 'testcommision');
+        formData.append('color', '#fffff');
+        formData.append("photo", { uri: image, name: fileName, type: 'image/jpeg' });
+        formData.append('category', 1);
+        formData.append('subcat', 1);
+        const url = "http://127.0.0.1:5000/Add_Services";
+        const config = {
+            headers: { 'content-type': 'multipart/form-data' }
+        }
+        axios.post(url, formData, config)
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        // axios('http://127.0.0.1:5000/Add_Services', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'multipart/form-data',
+        //     },
+
+        // });
     }
+
     return (
         <DismissKeyboard>
 
@@ -110,10 +148,10 @@ export default function Addservicemodal({ onPress, isVisible }) {
                             <Button title="Upload New Photo" onPress={pickImage} />
                             {image && <Image source={{ uri: image }} style={{ width: 180, height: 150 }} />}
                         </View>
-                        <Button onPress={handleTestImg} title={'Test'}/>
+                        <Button onPress={handleTestImg} title={'Test'} />
                         <View style={styles.listBoxContainer}>
 
-                        <Listbox title={'Category'} onPress={showListCategory} value={defaultValueCategory?.category_name}/>
+                            <Listbox title={'Category'} onPress={showListCategory} value={defaultValueCategory?.category_name} />
                         </View>
                     </View>
                     <View style={styles.btnContainer}>
@@ -125,11 +163,11 @@ export default function Addservicemodal({ onPress, isVisible }) {
                         </View>
                     </View>
                 </View>
-                    <ItemBottomSheet 
+                <ItemBottomSheet
                     listItem={listCategoryFromStore}
-                    isVisible ={isVisibleBottomSheet} 
-                    offBottomSheet={()=> setIsVisibleBottomSheet(false)}
-                    chooseCategory={(value) =>setdefaultValueCategory(value)}/>
+                    isVisible={isVisibleBottomSheet}
+                    offBottomSheet={() => setIsVisibleBottomSheet(false)}
+                    chooseCategory={(value) => setdefaultValueCategory(value)} />
                 {/*  */}
             </ReactNativeModal>
         </DismissKeyboard>
@@ -142,7 +180,7 @@ const styles = StyleSheet.create({
         // backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-        position : 'relative'
+        position: 'relative'
     },
     container: {
         flex: 1,
@@ -199,8 +237,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#3498db'
     },
-    listBoxContainer : {
-        width : '70%'
+    listBoxContainer: {
+        width: '70%'
     }
 
 })
