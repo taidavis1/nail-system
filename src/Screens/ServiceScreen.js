@@ -12,11 +12,14 @@ import Addsubcatmodal from '../Components/AddSubCatModal';
 import { fetchCategory } from '../store/slices/Category/categoryAction';
 import { addCurrentCategoryID } from '../store/slices/Category/categorySlice';
 import Servicecontainer from '../Components/ServiceContainer';
+import Addservicemodal from '../Components/AddServiceModal';
+import ItemBottomSheet from '../Components/BottomSheet';
 
 export default function Servicescreen(props) {
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [isVisible_SubCat, setisVisible_SubCat] = useState(false)
+    const [isVisible_Service,setisVisible_Services] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -40,6 +43,10 @@ export default function Servicescreen(props) {
         setisVisible_SubCat(!isVisible_SubCat)
     }
 
+    const toggleModal_Service = () => {
+        setisVisible_Services(!isVisible_Service)
+    }
+
     const clickCategory = (categoryname, id) => {
         switch (categoryname) {
             case 'Add new Category':
@@ -60,6 +67,7 @@ export default function Servicescreen(props) {
         <View style={styles.container}>
             <Addcategorymodal isVisible={isModalVisible} onPress={toggleModal} />
             <Addsubcatmodal isVisible={isVisible_SubCat} onPress={toggleModal_SubCat} />
+            <Addservicemodal isVisible={isVisible_Service} onPress={toggleModal_Service}/>
             <HeaderBase screenName={'Service'} />
             <View style={styles.wrapper}>
 
@@ -84,7 +92,7 @@ export default function Servicescreen(props) {
                             onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
-                        <Servicecontainer/>
+                        <Servicecontainer onPress={() => setisVisible_Services(true)}/>
                     </View>
                 </View>
             </View>

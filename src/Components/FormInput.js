@@ -1,13 +1,16 @@
 import React from 'react'
 import { StyleSheet, TextInput,View, Text, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native'
 
-export default function Forminput({label, help, onChange}) {
+export default function Forminput({label, help, onChange, width}) {
     const sendInputValue = (value) => {
         onChange(value)
     }
 
     return (
-        <View style = {styles.container}>
+        <View style = {[styles.container,{
+            width : width ? width : '70%',
+            marginHorizontal : 10
+        }]}>
             <View style = {styles.label}>
                 <Text style = {styles.labelTxt}>{label}</Text>
             </View>
@@ -22,7 +25,7 @@ export default function Forminput({label, help, onChange}) {
 
 const styles = StyleSheet.create({
     container : {
-        width : '70%',
+        
     },
     label : {
         paddingVertical : 10
