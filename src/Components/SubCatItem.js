@@ -1,13 +1,14 @@
 import React from 'react'
 import { Button } from '@rneui/base'
 import { StyleSheet, View } from 'react-native'
+import { useSelector } from 'react-redux';
 
-export default function Subcatitem({title}) {
-    
+export default function Subcatitem({title, id, pressSubCat}) {
+    const currentSubCatID = useSelector(state => state.category.currentSubCat)
+
     return (
         <View style ={styles.container}>
-
-        <Button title={title}/>
+        <Button title={title} color={ (id === currentSubCatID ? 'warning' : 'primary')} onPress={() => pressSubCat(id)}/>
         </View>
     )
 }

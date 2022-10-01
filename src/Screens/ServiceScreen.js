@@ -10,10 +10,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Icon } from '@rneui/base'
 import Addsubcatmodal from '../Components/AddSubCatModal';
 import { fetchCategory } from '../store/slices/Category/categoryAction';
-import { addCurrentCategoryID } from '../store/slices/Category/categorySlice';
+import { addChooseCategory, addCurrentCategoryID, addCurrentSubCatID } from '../store/slices/Category/categorySlice';
 import Servicecontainer from '../Components/ServiceContainer';
 import Addservicemodal from '../Components/AddServiceModal';
-import ItemBottomSheet from '../Components/BottomSheet';
+import { fetchServicesByCat, fetchsServicesBySubCat } from '../store/slices/Services/serviceAction';
 
 export default function Servicescreen(props) {
 
@@ -22,18 +22,20 @@ export default function Servicescreen(props) {
     const [isVisible_Service,setisVisible_Services] = useState(false)
 
     const dispatch = useDispatch()
-
     const listCategoryFromStore = useSelector(state => state.category.category)
     const currentCategoryID = useSelector(state => state.category.currentCategory)
     const SubCatdata = listCategoryFromStore?.filter(item => item.id === currentCategoryID)[0]?.subCategories
+    const currenSubCatID = useSelector(state => state.category.currentSubCat)
+    const [rerenderServiceContainer, setrerenderServiceContainer] = useState(false)
 
     useEffect(() => {
-        dispatch(fetchCategory({currentCategoryID : currentCategoryID}))
-    }, [dispatch, isModalVisible, isVisible_SubCat])
+        dispatch(fetchCategory({currentCategoryID : currentCategoryID,currentSubCatID : currenSubCatID}))
+    }, [dispatch, isModalVisible, isVisible_SubCat,isVisible_Service])
+    
 
     const renderCategoryItem = ({ item }) => {
         return <Categoryitem categoryname={item.category_name} color={item.color} id={item.id}
-            clickCategory={(categoryname, id) => clickCategory(categoryname, id)} />
+            clickCategory={(categoryname, id) => clickCategory(categoryname, id)}/>
     }
 
     const toggleModal = () => {
@@ -54,12 +56,16 @@ export default function Servicescreen(props) {
                 break;
             default:
                 dispatch(addCurrentCategoryID({id}))
+                dispatch(fetchServicesByCat({categoryID : id}))
+                dispatch(addChooseCategory({categoryID : id}))
                 break;
         }
     }
 
-
-
+    const handlePressSubCat = (subCatId) => {
+        dispatch(addCurrentSubCatID({id : subCatId}))
+        dispatch(fetchsServicesBySubCat({categoryID : currentCategoryID,subCatID : subCatId}))
+    }
 
 
 
@@ -85,14 +91,14 @@ export default function Servicescreen(props) {
                         <ScrollView style={styles.subCatItemLeft}
                             horizontal={true}>
                             {SubCatdata?.map(
-                            (item) => <Subcatitem title={item.name} key={item.id}/>
+                            (item) => <Subcatitem title={item.name} key={item.id}   id ={item.id} pressSubCat={(value)=> handlePressSubCat(value)}/>
                         )}
                         </ScrollView>
                         <TouchableOpacity style={styles.addSubCatContainer}
                             onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
-                        <Servicecontainer onPress={() => setisVisible_Services(true)}/>
+                        <Servicecontainer onPress={() => setisVisible_Services(true)} />
                     </View>
                 </View>
             </View>

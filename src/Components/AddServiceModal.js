@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, Image, Alert } from 'react-native'
 import ReactNativeModal from 'react-native-modal'
 import { Button } from "@rneui/themed";
 import Forminput from './FormInput';
@@ -8,38 +8,75 @@ import { RgbColorPicker } from './ColorPicker';
 import * as ImagePicker from 'expo-image-picker';
 import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
-import { useSelector } from 'react-redux';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import CategoryServices from '../Services/CategoryServices';
+import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
 
 export default function Addservicemodal({ onPress, isVisible }) {
+    // useDispatch to dispatch action from redux
+    const dispatch = useDispatch()
 
-    const currenCategoryID = useSelector(state => state.category.currentCategory)
+    // Get data from store REDUX
+    const chooseCategoryID = useSelector(state => state.category.chooseCategory)
     const listCategoryFromStore = useSelector(state => state.category.category)
-    const currentCategory = listCategoryFromStore?.filter(item => item.id === currenCategoryID)[0]
+    let currentSubCatList
+    let currentCategory
+    if (chooseCategoryID) {
+        currentCategory = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0]
+        currentSubCatList = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0].subCategories
+    }
 
+    const listSubCatByCategory = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0]?.subCategories
 
+    const choosesubCatID = useSelector(state=> state.category.chooseSubCat)
+    let currentSubCat;
+    if (!choosesubCatID) {
+        currentSubCat = listSubCatByCategory ? listSubCatByCategory[0] : null
+    }else {
+        currentSubCat = listSubCatByCategory?.filter(item => item.id === choosesubCatID)
+    }
+    const [valueSubCat, setvalueSubCat, onClose] = useState()
+    
+    // State handle change input
     const [name, setName] = useState()
     const [displayName, setDisplayName] = useState()
     const [price, setPrice] = useState()
-    const [Commision, setCommision] = useState()
+    const [commision, setCommision] = useState()
     const [chooseColor, setChooseColor] = useState()
     const [image, setImage] = useState(null);
-    const [testImg, settestImg] = useState()
-    const [isVisibleBottomSheet, setIsVisibleBottomSheet] = useState(false);
-    const [defaultValueCategory, setdefaultValueCategory] = useState(currentCategory);
-    const [fileName, setFileName] = useState()
+    const [isVisibleCategorySheet, setIsVisibleCategorySheet] = useState(false);
+    const [isVisibleSubCatSheet, setisVisibleSubCatSheet] = useState(false)
+
 
     const getInputValue = (value) => {
         setName(value)
     }
     const clickSave = () => {
-        onPress()
+        Alert.alert(
+            "Alert",
+            "Do you want to save ?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "OK", onPress: () => {
+                    CategoryServices.addService(displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat)
+                    .then(res => {
+                        console.log(res)
+                        onPress()})
+                    .catch(err => {
+                        console.log(err)
+                        alert(err)
+                    })
+                } }
+            ]
+        )
     }
     const getColor = (value) => {
         setChooseColor(value)
     }
-    let uri;
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -48,72 +85,29 @@ export default function Addservicemodal({ onPress, isVisible }) {
             aspect: [4, 3],
             quality: 1,
         });
-
-        console.log(result);
-        setFileName(result.fileName);
-
         if (!result.cancelled) {
             setImage(result.uri);
         }
     };
 
-    console.log('img', image)
     const showListCategory = () => {
-        setIsVisibleBottomSheet(true)
+
+        setIsVisibleCategorySheet(true)
     }
 
-    // const handleTestImg = () => {
-    //     axios.post('http://127.0.0.1:5000/Add_services', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //         body: {
-    //             displayName: 'testDisplay',
-    //             name: 'testname',
-    //             price: '2000',
-    //             commission: 'testcommision',
-    //             color: 'red',
-    //             // photo: image,
-    //             category: '1',
-    //             subcat: '1'
-    //         }
-    //     }).then(
-    //         res => console.log(res)
-    //     ).catch(
-    //         err => console.log(err)
-    //     )
-    // }
-    const handleTestImg = () => {
-        let formData = new FormData();
-        formData.append('displayName', 'testDisplay');
-        formData.append('name', 'testName_1');
-        formData.append('price', '2000');
-        formData.append('commission', 'testcommision');
-        formData.append('color', '#fffff');
-        formData.append("photo", { uri: image, name: fileName, type: 'image/jpeg' });
-        formData.append('category', 1);
-        formData.append('subcat', 1);
-        const url = "http://127.0.0.1:5000/Add_Services";
-        const config = {
-            headers: { 'content-type': 'multipart/form-data' }
-        }
-        axios.post(url, formData, config)
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        // axios('http://127.0.0.1:5000/Add_Services', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-
-        // });
+    const showListSubCat = () => {
+        setisVisibleSubCatSheet(true)
+    }
+    const handleChooseCategory = (cat) => {
+        dispatch(addChooseCategory({categoryID : cat.id}))
+        setvalueSubCat()
     }
 
+    const handleChooseSubCat = (subCat) => {
+        setvalueSubCat(subCat)
+        // console.log(valueSubCat)
+        dispatch(addChooseSubCat({subCatID : subCat[0]?.id}))
+    }
     return (
         <DismissKeyboard>
 
@@ -148,10 +142,12 @@ export default function Addservicemodal({ onPress, isVisible }) {
                             <Button title="Upload New Photo" onPress={pickImage} />
                             {image && <Image source={{ uri: image }} style={{ width: 180, height: 150 }} />}
                         </View>
-                        <Button onPress={handleTestImg} title={'Test'} />
                         <View style={styles.listBoxContainer}>
 
-                            <Listbox title={'Category'} onPress={showListCategory} value={defaultValueCategory?.category_name} />
+                            <Listbox title={'Category'} onPress={showListCategory} 
+                                    value={currentCategory ? currentCategory?.category_name : ''} />
+                            <Listbox title={'SubCat'} onPress={showListSubCat} 
+                                    value={valueSubCat?.name} />
                         </View>
                     </View>
                     <View style={styles.btnContainer}>
@@ -165,9 +161,14 @@ export default function Addservicemodal({ onPress, isVisible }) {
                 </View>
                 <ItemBottomSheet
                     listItem={listCategoryFromStore}
-                    isVisible={isVisibleBottomSheet}
-                    offBottomSheet={() => setIsVisibleBottomSheet(false)}
-                    chooseCategory={(value) => setdefaultValueCategory(value)} />
+                    isVisible={isVisibleCategorySheet}
+                    offBottomSheet={() => setIsVisibleCategorySheet(false)}
+                    chooseCategory={(value) => handleChooseCategory(value)} />
+                <ItemBottomSheet
+                    listItem={listSubCatByCategory}
+                    isVisible={isVisibleSubCatSheet}
+                    offBottomSheet={() => setisVisibleSubCatSheet(false)}
+                    chooseCategory={(value) => handleChooseSubCat(value)} />
                 {/*  */}
             </ReactNativeModal>
         </DismissKeyboard>

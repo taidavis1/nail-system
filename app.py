@@ -15,7 +15,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49192/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -181,9 +181,14 @@ def add_category():
 @app.route('/Add_Subcat' , methods = ['POST'])
 def add_subcat():
     
+
     name = request.json['name']
     
     id = request.json['category']
+
+    print('name :' +name,'categoryid:' + id)
+
+    print('aaa')
     
     subcat_add = Subcat(name , id)
     
@@ -216,6 +221,8 @@ def addPhoto():
     subCategories = request.form.get('subCategories')
     
     photo.save(os.path.join("/Users/macbook/nails-app/nails-sys/images/", name + category))
+
+    print(display_name,name,price,commision,color, 'photo :' +photo,category,subCategories)
     
     service_photo = Services(display_name, name, price, commision, color, photo, category, subCategories)
     
@@ -283,7 +290,31 @@ def add_services():
     return services_sche.jsonify([services_add])
 
 ######## ADD IMAGE TO DATABASE FROM FE
+@app.route('/get_services_by_category/<int:category>' , methods = ['POST'])
+def get_services_by_category(category):
+                
+    # category_list = Services.query.all()
+    
+    category_list = Services.query.filter_by(category = category).all()
+    
+    print(category_list)
+            
+    all_data = services_sche.dump(category_list)
+        
+    return jsonify(all_data)
 
+@app.route('/get_services_by_subcat/<int:category>/<int:subcat>' , methods = ['POST'])
+def get_services_by_subcat(category, subcat):
+                
+    # category_list = Services.query.all()
+    
+    category_list = Services.query.filter_by(category = category,subCategories = subcat,).all()
+    
+    print(category_list)
+            
+    all_data = services_sche.dump(category_list)
+        
+    return jsonify(all_data)
     
             
 ####################################################

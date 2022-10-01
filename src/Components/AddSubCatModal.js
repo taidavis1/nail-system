@@ -7,6 +7,7 @@ import DismissKeyboard from './DismissKeyboard';
 import CategoryServices from '../Services/CategoryServices';
 import { useSelector } from 'react-redux';
 
+
 export default function Addsubcatmodal({ onPress, isVisible }) {
     const [subCatName, setSubCatName] = useState()
     const currentCategoryID = useSelector(state => state.category.currentCategory)
@@ -14,7 +15,13 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
         setSubCatName(value)
     }
     const clickSave = () => {
-        onPress()
+        CategoryServices.addSubCat(subCatName,`${currentCategoryID}`)
+        .then(res => {
+            console.log(res)
+            onPress()
+        })
+        .catch(err => console.log(err))
+
     }
 
     return (

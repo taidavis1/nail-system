@@ -6,7 +6,8 @@ export const fetchCategory = createAsyncThunk(
     async (data, thunkAPI) => {
         const response = await CategoryServices.getCategory()
         return {response,
-            currentID : data.currentCategoryID}
+            currentID : data.currentCategoryID,
+            currentSubCatID : data.currentCatID}
     }
 )
 

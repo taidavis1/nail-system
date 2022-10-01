@@ -20,12 +20,12 @@ export default function ItemBottomSheet({isVisible,offBottomSheet,listItem, choo
                 offBottomSheet()
             }}
             containerStyle = {{
-                backgroundColor : item.color,
-                borderRadius : 10
+                backgroundColor : item.color ? item.color : '#ecf0f1',
+                // borderRadius : 10
             }} 
             Component={TouchableOpacity}>
                 <ListItem.Content>
-                    <ListItem.Title style={{fontWeight : 'bold'}}>{item.category_name}</ListItem.Title>
+                    <ListItem.Title style={{fontWeight : 'bold'}}>{item.category_name ? item.category_name : item.name}</ListItem.Title>
                 </ListItem.Content>
             </ListItem>
         ))}
