@@ -51,7 +51,7 @@ const CategoryServices = {
         formData.append('color', chooseColor);
         formData.append("photo", { uri: image, name: 'image', type: 'image/jpeg' });
         formData.append('category', category);
-        formData.append('subcat', subcat);
+        formData.append('subcat', subcat.id);
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
                     }
@@ -71,7 +71,7 @@ const CategoryServices = {
                         const {data} = res
                         resolve(data)
                     }
-                ).catch(err => console.log(err))
+                ).catch(err => reject(err))
             })
         },
         getServicesByCat :  async (categoryID) => {
@@ -81,7 +81,7 @@ const CategoryServices = {
                         const {data} = res
                         resolve(data)
                     }
-                ).catch(err => console.log(err))
+                ).catch(err => reject(err))
             })
         },
         getServiceBySubCat : async (categoryID,subCatID) => {
@@ -91,7 +91,7 @@ const CategoryServices = {
                         const {data} = res
                         resolve(data)
                     }
-                ).catch(err => console.log(err))
+                ).catch(err => reject(err))
             })
         }
     }
