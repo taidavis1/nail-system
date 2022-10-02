@@ -9,6 +9,15 @@ export const fetchServices = createAsyncThunk(
     }
 )
 
+export const addService = createAsyncThunk(
+    'services/addService',
+    async(data,thunkAPI) => {
+        const {displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat} = data
+        const response = await CategoryServices.addService(displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat)
+        return response;
+    }
+)
+
 export const fetchServicesByCat = createAsyncThunk(
     'services/fetchServicesByCat',
     async (data, thunkAPI) => {

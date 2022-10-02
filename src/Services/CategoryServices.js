@@ -1,8 +1,4 @@
-import axios from "axios";
 import api from ".";
-import { baseURL } from './index';
-
-const baseUrl = 'http://127.0.0.1:5000';
 
 const CategoryServices = {
     getCategory: async () => {
@@ -51,7 +47,7 @@ const CategoryServices = {
         formData.append('color', chooseColor);
         formData.append("photo", { uri: image, name: 'image', type: 'image/jpeg' });
         formData.append('category', category);
-        formData.append('subcat', subcat.id);
+        formData.append('subcat', subcat);
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
                     }

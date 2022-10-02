@@ -11,6 +11,7 @@ import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import CategoryServices from '../Services/CategoryServices';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
+import { addService } from '../store/slices/Services/serviceAction';
 
 export default function Addservicemodal({ onPress, isVisible }) {
     // useDispatch to dispatch action from redux
@@ -62,14 +63,19 @@ export default function Addservicemodal({ onPress, isVisible }) {
                     style: "cancel"
                 },
                 { text: "OK", onPress: () => {
-                    CategoryServices.addService(displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat)
-                    .then(res => {
-                        console.log(res)
-                        onPress()})
-                    .catch(err => {
-                        console.log(err)
-                        alert(err)
-                    })
+                    dispatch(addService({
+                        displayName : displayName,
+                        name : name,
+                        price : price,
+                        commision : commision,
+                        chooseColor : chooseColor,
+                        image : image,
+                        chooseCategoryID : chooseCategoryID,
+                        valueSubCat : valueSubCat.id
+                    }))
+                    setImage()
+                    setvalueSubCat()
+                    onPress()
                 } }
             ]
         )

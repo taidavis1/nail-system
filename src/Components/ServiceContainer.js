@@ -15,7 +15,7 @@ export default function Servicecontainer({onPress}) {
         dispatch(fetchServices())
     }, [dispatch])
     const serviceList = useSelector(state => state.services.serviceList)
-
+    
     const renderData = [{
         id : 'add_service',
         color : '#bdc3c7',
@@ -23,7 +23,7 @@ export default function Servicecontainer({onPress}) {
         photo : ''
     },...serviceList]
     const changeToUrl = (item) => {
-        const ObjPhotoUrl = item.split('/')
+        const ObjPhotoUrl = item?.split('/')
         const nameImg = ObjPhotoUrl[Object.keys(ObjPhotoUrl).length - 1]
         const ImgUrl =  `${baseURL}/static/images/${nameImg}`
         return ImgUrl
