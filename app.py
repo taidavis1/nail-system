@@ -1,3 +1,4 @@
+from pyclbr import Function
 from flask import Flask , redirect , render_template , jsonify, url_for, request , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -15,7 +16,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49504/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -199,7 +200,6 @@ def add_subcat():
     return sub_sche.jsonify([subcat_add])
 
 
-
 @app.route('/Add-photo', methods = ['POST'])
 
 def addPhoto():
@@ -233,7 +233,7 @@ def addPhoto():
     return jsonify('success!!!')
 
 
-
+######## ADD IMAGE TO DATABASE FROM FE
 @app.route('/Add_Services' , methods = ['POST'])
 
 def add_services():
@@ -289,7 +289,10 @@ def add_services():
     
     return services_sche.jsonify([services_add])
 
-######## ADD IMAGE TO DATABASE FROM FE
+
+# Function get serive by category_id
+# Param Request 
+# Return data
 @app.route('/get_services_by_category/<int:category>' , methods = ['POST'])
 def get_services_by_category(category):
                 
@@ -303,6 +306,10 @@ def get_services_by_category(category):
         
     return jsonify(all_data)
 
+
+# Function get serive by subcat_id
+# Param Request 
+# Return data
 @app.route('/get_services_by_subcat/<int:category>/<int:subcat>' , methods = ['POST'])
 def get_services_by_subcat(category, subcat):
                 
@@ -315,7 +322,86 @@ def get_services_by_subcat(category, subcat):
     all_data = services_sche.dump(category_list)
         
     return jsonify(all_data)
+
+
+# Function Delete Services by service_id
+# Params Request 
+# Return json message
+@app.route('/delete_service', methods = ['POST'])
+def delete_service():
     
+    service_id = request.json['service_id']
+    
+    if service_id == '':
+        
+        return('param missing')
+    else:
+    
+        item = Services.query.filter_by(id = service_id).first()
+        
+        db.session.delete(item)
+        
+        db.session.commit()
+        
+        return jsonify('successfully delete service')
+
+
+# Function delete services by subcat_id 
+# Params int + int 
+# Return json message
+@app.route('/delete_service_by_subcat_id/<int:category_id>/<int:subcat_id>', methods = ['GET'])
+def delete_services_by_subcat(category_id, subcat_id):
+    
+    items = Services.query.filter_by(category = category_id, subCategories = subcat_id).all()
+    
+    db.session.delete(items)
+    
+    db.session.commit()
+    
+    return('success')
+
+
+# Function Edit Services
+# Params Request 
+# Return data 
+@app.route('/edit_service_infor', methods = ['POST'])
+def edit_services():
+    
+    category_id = request.json['category_id']
+    
+    subcat_id = request.json['subcat_id']
+    
+    service_id = request.json['service_id']
+    
+    new_name = request.json['name']
+    
+    new_photo = request.files['photo']
+    
+    new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name + ".png")
+    
+    new_photo.save(new_image_path)
+    
+    item = Services.query.filter_by(id = service_id, category = category_id, subCategory = subcat_id)
+    
+    for i in item:
+        item.display_name = request.json['display_name']
+        
+        item.name = new_name
+        
+        item.price = request.json['price']
+        
+        item.commision = request.json['commision']
+        
+        item.color = request.json['color']
+        
+        item.photo = new_image_path
+        
+        db.session.save(item)
+        
+        db.session.commit()
+    
+    return services_sche.jsonify([item])
+
             
 ####################################################
 
