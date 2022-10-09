@@ -49,8 +49,10 @@ export const servicesSlice = createSlice({
         [addService.pending] : (state, {payload}) => {
             state.loading = true
         },
-        [addService.fulfilled] : (state, {payload}) => {
-            // console.log(payload)
+        [addService.fulfilled] : (state, action) => {
+            const currentState = {...state}
+            console.log(currentState)
+            // state.serviceList = [...state.serviceList,payload]
             state.loading = false
             state.message = 'Success'
         },

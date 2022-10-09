@@ -14,6 +14,7 @@ export const addService = createAsyncThunk(
     async(data,thunkAPI) => {
         const {displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat} = data
         const response = await CategoryServices.addService(displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat)
+        console.log('res',response)
         return response;
     }
 )
