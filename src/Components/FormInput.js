@@ -1,7 +1,7 @@
 import React from 'react'
-import { StyleSheet, TextInput,View, Text, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { StyleSheet, TextInput,View, Text } from 'react-native'
 
-export default function Forminput({label, help, onChange, width}) {
+export default function Forminput({label, defaultValue,help, onChange, width,...props}) {
     const sendInputValue = (value) => {
         onChange(value)
     }
@@ -12,11 +12,13 @@ export default function Forminput({label, help, onChange, width}) {
             marginHorizontal : 10
         }]}>
             <View style = {styles.label}>
-                <Text style = {styles.labelTxt}>{label}</Text>
+                <Text style = {styles.labelTxt} {...props}>{label}</Text>
             </View>
             <View style = {styles.inputContainer} >
                 <TextInput placeholder={help} style={styles.input}  
-                            onChangeText={(value) =>sendInputValue(value)}/>
+                            defaultValue={defaultValue}
+                            onChangeText={(value) =>sendInputValue(value)}
+                            {...props}/>
             </View>
         </View>
     )

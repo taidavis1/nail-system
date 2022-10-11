@@ -76,7 +76,7 @@ export default function Serviceitem({onDelete,onEdit,onLongPress,holddingItem,it
                                     <Ionicon name='trash-outline' size={25} />
                                 </TouchableOpacity>
                                 <TouchableOpacity 
-                                onPress={() => onEdit(item.id)}
+                                onPress={() => onEdit(item.id,item)}
                                 style={{
                                     width : '50%',
                                     justifyContent: 'center',

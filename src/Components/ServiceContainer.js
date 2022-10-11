@@ -2,19 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Text, Alert } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteService, fetchServices } from '../store/slices/Services/serviceAction'
-import { baseURL } from '../Services/index';
 import { FlatList } from 'react-native-gesture-handler'
 import Serviceitem from './ServiceItem'
 
 
 
-export default function Servicecontainer({ onPress }) {
+export default function Servicecontainer({ onPress ,onEdit}) {
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(fetchServices())
     }, [dispatch])
     const serviceList = useSelector(state => state.services.serviceList)
-    // console.log('servicelist', serviceList)
     const [holddingItem, setholddingItem] = useState()
     const renderData = [{
         id: 'add_service',
@@ -40,19 +38,21 @@ export default function Servicecontainer({ onPress }) {
             [
                 {
                     text: "Cancel",
-                    style: "cancel"
+                    style: "destructive",
                 },
-                { text: "OK", onPress: () => {
-                    dispatch(deleteService({serviceID : value}))
-                }
+                {   text: "OK", 
+                    onPress: () => {
+                        dispatch(deleteService({serviceID : value}))
+                        } ,
+                    style : 'default'
                 }
             ]
         );
 
     }
 
-    const handleEditService = (value) => {
-        console.log(value)
+    const handleEditService = (value,item) => {
+        onEdit(value,item)
     }
     const renderItem = ({ item }) => {
         return <Serviceitem

@@ -43,7 +43,7 @@ function getColor(x, colors) {
 const RgbColorPicker = ({ categoryname,containerStyle, barStyle,
                         previewStyle, ballStyle, initialBaseSlider, 
                         initialBase, onBaseSlider, onBase, initialColorSlider, 
-                        initialColor, onColorSlider, onColor, getColorFromColorPicker}) => {
+                        initialColor, onColorSlider, onColor, getColorFromColorPicker, defaultColor}) => {
     const [width, setWidth] = useState(typeof containerStyle?.width === "number"
         ? containerStyle.width
         : 0);
@@ -59,7 +59,6 @@ const RgbColorPicker = ({ categoryname,containerStyle, barStyle,
     const selectedColor = useRef(new Animated.Value(0)).current;
     const [colorSlide, setColorSlide] = useState(initialColorSlider ? initialColorSlider * width : 0);
     const [color, setColor] = useState(initialColor || [0, 0, 0]);
-
 
     useEffect(() => {
         getColorFromColorPicker(mapColorNumToString(color))

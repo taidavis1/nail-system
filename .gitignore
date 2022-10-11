@@ -12,3 +12,4 @@ web-build/
 static/
 # macOS
 .DS_Store
+static/

@@ -14,19 +14,21 @@ import { addChooseCategory, addCurrentCategoryID, addCurrentSubCatID } from '../
 import Servicecontainer from '../Components/ServiceContainer';
 import Addservicemodal from '../Components/AddServiceModal';
 import { fetchServicesByCat, fetchsServicesBySubCat } from '../store/slices/Services/serviceAction';
+import Eidtservicemodal from '../Components/EditServiceModal';
 
 export default function Servicescreen(props) {
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [isVisible_SubCat, setisVisible_SubCat] = useState(false)
     const [isVisible_Service,setisVisible_Services] = useState(false)
+    const [isVisible_EditService, setisVisible_EditService] = useState(false)
+    const [editService, seteditService] = useState()
 
     const dispatch = useDispatch()
     const listCategoryFromStore = useSelector(state => state.category.category)
     const currentCategoryID = useSelector(state => state.category.currentCategory)
     const SubCatdata = listCategoryFromStore?.filter(item => item.id === currentCategoryID)[0]?.subCategories
     const currenSubCatID = useSelector(state => state.category.currentSubCat)
-    const [rerenderServiceContainer, setrerenderServiceContainer] = useState(false)
 
     useEffect(() => {
         dispatch(fetchCategory({currentCategoryID : currentCategoryID,currentSubCatID : currenSubCatID}))
@@ -48,7 +50,10 @@ export default function Servicescreen(props) {
     const toggleModal_Service = () => {
         setisVisible_Services(!isVisible_Service)
     }
-
+    const toggleModal_EditService = (itemID,item) => {
+        seteditService(item)
+        setisVisible_EditService(!isVisible_EditService)
+    }
     const clickCategory = (categoryname, id) => {
         switch (categoryname) {
             case 'Add new Category':
@@ -78,6 +83,7 @@ export default function Servicescreen(props) {
             <Addcategorymodal isVisible={isModalVisible} onPress={toggleModal} />
             <Addsubcatmodal isVisible={isVisible_SubCat} onPress={toggleModal_SubCat} />
             <Addservicemodal isVisible={isVisible_Service} onPress={toggleModal_Service}/>
+            <Eidtservicemodal isVisible={isVisible_EditService} onPress={toggleModal_EditService} editService ={editService}/>
             <HeaderBase screenName={'Service'} />
             <View style={styles.wrapper}>
 
@@ -102,7 +108,7 @@ export default function Servicescreen(props) {
                             onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
-                        <Servicecontainer onPress={() => setisVisible_Services(true)} />
+                        <Servicecontainer onPress={() => setisVisible_Services(true)} onEdit={toggleModal_EditService}/>
                     </View>
                 </View>
             </View>
