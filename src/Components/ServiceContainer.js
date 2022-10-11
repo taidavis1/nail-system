@@ -33,7 +33,7 @@ export default function Servicecontainer({ onPress }) {
     const handleHoldItem = (value) => {
         setholddingItem(value)
     }
-    const handleDeleteService = (value,display_name) => {
+    const handleDeleteService = (value, display_name) => {
         Alert.alert(
             "Delete!",
             `Do you wanna Delete ${display_name}?`,
@@ -42,9 +42,10 @@ export default function Servicecontainer({ onPress }) {
                     text: "Cancel",
                     style: "cancel"
                 },
-                { text: "OK", onPress: () => {
-                    dispatch(deleteService({serviceID : value}))
-                }
+                {
+                    text: "OK", onPress: () => {
+                        dispatch(deleteService({ serviceID: value }))
+                    }
                 }
             ]
         );

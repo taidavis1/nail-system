@@ -293,8 +293,8 @@ def add_services():
 # Function get serive by category_id
 # Param Request 
 # Return data
-@app.route('/get_services_by_category/<int:category>' , methods = ['POST'])
-def get_services_by_category(category):
+@app.route('/get_services_by_category/<int:category>' , methods = ['GET'])
+def get_services_by_id(category):
                 
     # category_list = Services.query.all()
     
@@ -303,6 +303,19 @@ def get_services_by_category(category):
     print(category_list)
             
     all_data = services_sche.dump(category_list)
+        
+    return jsonify(all_data)
+
+@app.route('/get_services_by_id/<int:id>' , methods = ['GET'])
+def get_services_by_category(id):
+                
+    # category_list = Services.query.all()
+    
+    category_list = Services.query.filter_by(id = id).first()
+    
+    print(category_list)
+            
+    all_data = service_sche.dump(category_list)
         
     return jsonify(all_data)
 
@@ -345,6 +358,50 @@ def delete_service():
         
         return jsonify('successfully delete service')
 
+
+@app.route('/delete_subcat', methods = ['POST'])
+def delete_subcat():
+    
+    id = request.json['subcat_id']
+    
+    if id == '':
+        
+        return('param missing')
+    else:
+        
+        item_services = Services.query.filter_by(subCategories = id).all()
+        
+        all_data = services_sche.dump(item_services)
+        
+        for i in item_services: 
+            db.session.delete(i)
+
+        item = Subcat.query.filter_by(id = id).first()
+        
+        db.session.delete(item)
+        
+        db.session.commit()
+        
+        return jsonify('deleted subcat sucessfully')
+
+
+@app.route('/delete_category', methods = ['POST'])
+def delete_category():
+    
+    subcat_id = request.json['subcat_id']
+    
+    if subcat_id == '':
+        
+        return('param missing')
+    else:
+    
+        item = Subcat.query.filter_by(id = subcat_id).first()
+        
+        db.session.delete(item)
+        
+        db.session.commit()
+        
+        return jsonify('successfully delete subcat')
 
 # Function delete services by subcat_id 
 # Params int + int 
