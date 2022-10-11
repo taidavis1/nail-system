@@ -16,7 +16,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:50817/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -294,7 +294,7 @@ def add_services():
 # Param Request 
 # Return data
 @app.route('/get_services_by_category/<int:category>' , methods = ['GET'])
-def get_services_by_id(category):
+def get_services_by_category(category):
                 
     # category_list = Services.query.all()
     
@@ -306,10 +306,14 @@ def get_services_by_id(category):
         
     return jsonify(all_data)
 
-@app.route('/get_services_by_id/<int:id>' , methods = ['GET'])
-def get_services_by_category(id):
-                
-    # category_list = Services.query.all()
+
+# Function get serive by service_id
+# Param Request 
+# Return data
+@app.route('/get_services_by_id' , methods = ['POST'])
+def get_services_by_id():
+    
+    id = request.json['service_id']
     
     category_list = Services.query.filter_by(id = id).first()
     
