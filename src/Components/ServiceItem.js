@@ -7,7 +7,7 @@ import COLORS from '../Constant/color';
 const height = Dimensions.get('screen').height - 100
 const width = Dimensions.get('screen').width * 0.75 - 60
 
-export default function Serviceitem({onLongPress,holddingItem,item,handleclickItem,...props}) {
+export default function Serviceitem({onDelete,onEdit,onLongPress,holddingItem,item,handleclickItem,...props}) {
     const changeToUrl = (item) => {
         const ObjPhotoUrl = item?.split('/')
         const nameImg = ObjPhotoUrl[Object.keys(ObjPhotoUrl).length - 1]
@@ -65,6 +65,7 @@ export default function Serviceitem({onLongPress,holddingItem,item,handleclickIt
                                 // display : none
                             }]}>
                                 <TouchableOpacity 
+                                onPress={() => onDelete(item.id,item.display_name)}
                                 style={{
                                     width : '50%',
                                     borderRightColor : item.color,
@@ -75,6 +76,7 @@ export default function Serviceitem({onLongPress,holddingItem,item,handleclickIt
                                     <Ionicon name='trash-outline' size={25} />
                                 </TouchableOpacity>
                                 <TouchableOpacity 
+                                onPress={() => onEdit(item.id)}
                                 style={{
                                     width : '50%',
                                     justifyContent: 'center',

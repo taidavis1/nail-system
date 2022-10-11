@@ -14,7 +14,6 @@ export const addService = createAsyncThunk(
     async(data,thunkAPI) => {
         const {displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat} = data
         const response = await CategoryServices.addService(displayName, name, price, commision, chooseColor, image, chooseCategoryID, valueSubCat)
-        console.log('res',response)
         return response;
     }
 )
@@ -35,5 +34,17 @@ export const fetchsServicesBySubCat = createAsyncThunk(
         const {categoryID,subCatID} = data
         const response = await CategoryServices.getServiceBySubCat(categoryID , subCatID)
         return response
+    }
+)
+
+export const deleteService  = createAsyncThunk(
+    'services/deleteService',
+    async(data,thunkAPI) => {
+        const {serviceID} = data
+        const response = await CategoryServices.deleteService(serviceID)
+        return {
+            response,
+            deletedID : serviceID
+        }
     }
 )

@@ -9,7 +9,6 @@ import * as ImagePicker from 'expo-image-picker';
 import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
-import CategoryServices from '../Services/CategoryServices';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
 import { addService } from '../store/slices/Services/serviceAction';
 
@@ -24,7 +23,9 @@ export default function Addservicemodal({ onPress, isVisible }) {
     let currentCategory
     if (chooseCategoryID) {
         currentCategory = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0]
-        currentSubCatList = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0].subCategories
+        if (currentCategory) {
+            currentSubCatList = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0].subCategories
+        }
     }
 
     const listSubCatByCategory = listCategoryFromStore?.filter(item => item.id === chooseCategoryID)[0]?.subCategories

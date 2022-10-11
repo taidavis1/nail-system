@@ -89,6 +89,21 @@ const CategoryServices = {
                     }
                 ).catch(err => reject(err))
             })
+        },
+        deleteService : async (service_id) => {
+            return new Promise((resolve,reject) => {
+                api.call().post(`/delete_service`,
+                {
+                    service_id : service_id
+                }).then(
+                    res => {
+                        const {data} = res
+                        resolve(data)
+                    }
+                ).catch(
+                    err => reject(err)
+                )
+            })
         }
     }
 

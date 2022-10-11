@@ -16,7 +16,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49503/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:50817/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 

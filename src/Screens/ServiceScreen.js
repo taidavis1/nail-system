@@ -54,6 +54,10 @@ export default function Servicescreen(props) {
             case 'Add new Category':
                 toggleModal()
                 break;
+            case 'All' :
+                // dispatch(fetchServicesByCat({categoryID : id}))
+                console.log('all')
+                break;
             default:
                 dispatch(addCurrentCategoryID({id}))
                 dispatch(fetchServicesByCat({categoryID : id}))
