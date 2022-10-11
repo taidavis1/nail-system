@@ -10,6 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 static/
+static/images
+static/images/*.png
 # macOS
 .DS_Store
-static/
+.gitignore
