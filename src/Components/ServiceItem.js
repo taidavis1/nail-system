@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Text, View , TouchableOpacity, StyleSheet , Image, Dimensions, Touchable} from 'react-native'
 import Ionicon from '@expo/vector-icons/Ionicons'
 import { baseURL } from '../Services/index';

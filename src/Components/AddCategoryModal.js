@@ -6,6 +6,8 @@ import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
 import  { RgbColorPicker } from './ColorPicker';
 import CategoryServices from '../Services/CategoryServices';
+import Loadingcontent from './LoadingConten';
+import { useSelector } from 'react-redux';
 
 export default function Addcategorymodal({ onPress, isVisible }) {
     const [catagoryName, setCatagoryName] = useState()
@@ -25,9 +27,10 @@ export default function Addcategorymodal({ onPress, isVisible }) {
         setChooseColor(value)
     }
 
+    const loading = useSelector(state => state.category.loading)
     return (
         <DismissKeyboard>
-
+            <Loadingcontent loading={loading}>
             <ReactNativeModal isVisible={isVisible} style={styles.modalContainer} backdropOpacity={0.3}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Add New Category</Text>
@@ -52,6 +55,7 @@ export default function Addcategorymodal({ onPress, isVisible }) {
                     </View>
                 </View>
             </ReactNativeModal>
+            </Loadingcontent>
         </DismissKeyboard>
     )
 }

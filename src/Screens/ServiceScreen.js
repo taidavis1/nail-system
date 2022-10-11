@@ -53,6 +53,7 @@ export default function Servicescreen(props) {
     const toggleModal_EditService = (itemID,item) => {
         seteditService(item)
         setisVisible_EditService(!isVisible_EditService)
+
     }
     const clickCategory = (categoryname, id) => {
         switch (categoryname) {
@@ -108,7 +109,9 @@ export default function Servicescreen(props) {
                             onPress={() => setisVisible_SubCat(true)}><Icon size={30} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
-                        <Servicecontainer onPress={() => setisVisible_Services(true)} onEdit={toggleModal_EditService}/>
+                        <Servicecontainer   onPress={() => setisVisible_Services(true)} 
+                                            onEdit={toggleModal_EditService}
+                                            onFinishEdit={!isVisible_EditService ? true : false}/>
                     </View>
                 </View>
             </View>

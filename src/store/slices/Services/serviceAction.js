@@ -48,3 +48,12 @@ export const deleteService  = createAsyncThunk(
         }
     }
 )
+
+export const getServiceByID = createAsyncThunk(
+    'services/getServiceByID',
+    async(data,thunkAPI) => {
+        const {serviceID} = data
+        const response = await CategoryServices.getServiceByID(serviceID)
+        return response
+    }
+)

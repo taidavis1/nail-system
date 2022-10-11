@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
-import { addService, deleteService, fetchServices ,fetchServicesByCat,fetchsServicesBySubCat} from './serviceAction'
+import { addService, deleteService, fetchServices ,fetchServicesByCat,fetchsServicesBySubCat, getServiceByID} from './serviceAction'
 
 export const servicesSlice = createSlice({
     name: 'services',
@@ -70,13 +70,25 @@ export const servicesSlice = createSlice({
             const newList = currentServiceList.filter(
                 item => item.id !== action.payload.deletedID
             )
-            console.log('newList',newList)
             state.serviceList = newList
         },
         [deleteService.rejected] : (state,action) => {
             state.loading = false
             state.message = 'Fail request!'
+        },
+        // Maybe dont use
+        [getServiceByID.pending] : (state) => {
+            state.loading = true
+        },
+        [getServiceByID.fulfilled] : (state,action) => {
+            state.loading = false
+        },
+        [getServiceByID.rejected] : (state) => {
+            state.loading = false
+            state.message  = 'Fail request!'
         }
+        // 
+        // Edit Service Info
     }
 })
 

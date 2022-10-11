@@ -7,11 +7,20 @@ import Serviceitem from './ServiceItem'
 
 
 
-export default function Servicecontainer({ onPress ,onEdit}) {
+export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
+
     const dispatch = useDispatch()
+    // fetch first time render service item (default fetch all)
     useEffect(() => {
         dispatch(fetchServices())
     }, [dispatch])
+    // hide delete and Edit when close modal 
+    useEffect(() => {
+        if (onFinishEdit === true) {
+            setholddingItem()
+        }
+    }, [onFinishEdit])
+
     const serviceList = useSelector(state => state.services.serviceList)
     const [holddingItem, setholddingItem] = useState()
     const renderData = [{

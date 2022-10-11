@@ -11,6 +11,7 @@ import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
 import { addService } from '../store/slices/Services/serviceAction';
+import Loadingcontent from './LoadingConten';
 
 export default function Addservicemodal({ onPress, isVisible }) {
     // useDispatch to dispatch action from redux
@@ -115,9 +116,11 @@ export default function Addservicemodal({ onPress, isVisible }) {
         // console.log(valueSubCat)
         dispatch(addChooseSubCat({subCatID : subCat[0]?.id}))
     }
+
+    const loading = useSelector(state => state.services.loading)
     return (
         <DismissKeyboard>
-
+            <Loadingcontent loading={loading}>
             <ReactNativeModal isVisible={isVisible} style={styles.modalContainer} backdropOpacity={0.3}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Add New Services</Text>
@@ -178,6 +181,7 @@ export default function Addservicemodal({ onPress, isVisible }) {
                     chooseCategory={(value) => handleChooseSubCat(value)} />
                 {/*  */}
             </ReactNativeModal>
+            </Loadingcontent>
         </DismissKeyboard>
     )
 }

@@ -6,6 +6,7 @@ import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
 import CategoryServices from '../Services/CategoryServices';
 import { useSelector } from 'react-redux';
+import Loadingcontent from './LoadingConten';
 
 
 export default function Addsubcatmodal({ onPress, isVisible }) {
@@ -23,10 +24,10 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
         .catch(err => console.log(err))
 
     }
-
+    const loading = useSelector(state => state.category.loading)
     return (
         <DismissKeyboard>
-
+            <Loadingcontent loading={loading}>
             <ReactNativeModal isVisible={isVisible} style={styles.modalContainer} backdropOpacity={0.3}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Add New SubCat</Text>
@@ -44,6 +45,7 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
                     </View>
                 </View>
             </ReactNativeModal>
+            </Loadingcontent>
         </DismissKeyboard>
     )
 }

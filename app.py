@@ -16,7 +16,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49215/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -186,10 +186,6 @@ def add_subcat():
     name = request.json['name']
     
     id = request.json['category']
-
-    print('name :' +name,'categoryid:' + id)
-
-    print('aaa')
     
     subcat_add = Subcat(name , id)
     
@@ -436,13 +432,13 @@ def edit_services():
     
     new_name = request.json['name']
     
-    new_photo = request.files['photo']
+    # new_photo = request.files['photo']
     
-    new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name + ".png")
+    # new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name + ".png")
     
-    new_photo.save(new_image_path)
+    # new_photo.save(new_image_path)
     
-    item = Services.query.filter_by(id = service_id, category = category_id, subCategory = subcat_id)
+    item = Services.query.filter_by(id = service_id, category = category_id, subCategories = subcat_id)
     
     for i in item:
         item.display_name = request.json['display_name']
@@ -455,7 +451,7 @@ def edit_services():
         
         item.color = request.json['color']
         
-        item.photo = new_image_path
+        # item.photo = new_image_path
         
         db.session.save(item)
         

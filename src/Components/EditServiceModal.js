@@ -10,7 +10,7 @@ import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
-import { addService } from '../store/slices/Services/serviceAction';
+import { addService, getServiceByID } from '../store/slices/Services/serviceAction';
 import { baseURL } from '../Services/index';
 
 export default function Eidtservicemodal({ onPress, isVisible, editService }) {
@@ -24,6 +24,24 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }
     // useDispatch to dispatch action from redux
     const dispatch = useDispatch()
+    
+    useEffect(() => {
+        dispatch(getServiceByID({
+            serviceID : editService?.id
+        })).then(
+            res => {
+                if (res.payload) {
+                    setserviceInfo(res.payload)
+                    setImage(res.payload.photo)
+                    setName(res.payload.name)
+                    setDisplayName(res.payload.display_name)
+                    setChooseColor(res.payload.color)
+                    setCommision(res.payload.commision)
+                    setImage(res.payload.photo)
+                }
+            }
+        )
+    }, [isVisible === true])
 
     // Get data from store REDUX
     const chooseCategoryID = useSelector(state => state.category.chooseCategory)
@@ -48,8 +66,6 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }
     const [valueSubCat, setvalueSubCat, onClose] = useState()
 
-    const currentImg = changeToUrl(editService?.photo)
-    
     // State handle change input
     const [name, setName] = useState()
     const [displayName, setDisplayName] = useState()
@@ -59,6 +75,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     const [image, setImage] = useState();
     const [isVisibleCategorySheet, setIsVisibleCategorySheet] = useState(false);
     const [isVisibleSubCatSheet, setisVisibleSubCatSheet] = useState(false)
+    const [serviceInfo, setserviceInfo] = useState()
 
     const getInputValue = (value) => {
         setName(value)
@@ -71,21 +88,10 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                 {
                     text: "Cancel",
                     onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
+                    style: 'destructive'
                 },
                 { text: "OK", onPress: () => {
-                    dispatch(addService({
-                        displayName : displayName,
-                        name : name,
-                        price : price,
-                        commision : commision,
-                        chooseColor : chooseColor,
-                        image : image,
-                        chooseCategoryID : chooseCategoryID,
-                        valueSubCat : valueSubCat.id
-                    }))
-                    setImage()
-                    setvalueSubCat()
+                    console.log(chooseColor)
                     onPress()
                 } }
             ]
@@ -108,7 +114,6 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     };
 
     const showListCategory = () => {
-
         setIsVisibleCategorySheet(true)
     }
 
@@ -122,7 +127,6 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
 
     const handleChooseSubCat = (subCat) => {
         setvalueSubCat(subCat)
-        // console.log(valueSubCat)
         dispatch(addChooseSubCat({subCatID : subCat[0]?.id}))
     }
     return (
@@ -139,15 +143,15 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                         }}>
                             <Forminput label={'Service name'} help={'Example'}
                                 onChange={(value) => getInputValue(value)} width={'50%'} 
-                                defaultValue={editService?.name}/>
+                                defaultValue={serviceInfo?.name}/>
                             <Forminput label={'Display name'} help={'8 characters max'}
                                 onChange={(value) => setDisplayName(value)} width={'35%'} 
-                                defaultValue={editService?.display_name}/>
+                                defaultValue={serviceInfo?.display_name}/>
                             <Forminput label={'Price'} help={''} onChange={(value) => setPrice(value)} width={'50%'} 
-                                defaultValue={editService?.price + ''}/>
+                                defaultValue={serviceInfo?.price + ''}/>
                             <Forminput label={'Commision'} help={''} onChange={(value) => setCommision(value)}
                                 width={'35%'} 
-                                defaultValue={editService?.commision}/>
+                                defaultValue={serviceInfo?.commision}/>
                         </View>
 
                     </View>
@@ -156,13 +160,13 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                             <Text style={styles.colorTitle}>Pick Color :</Text>
                         </View>
                         <RgbColorPicker categoryname={''}
-                            initialColor={editService?.color}
+                            initialColor={serviceInfo?.color}
                             getColorFromColorPicker={(value) => getColor(value)} />
                     </View>
                     <View style={styles.img_listmenu}>
                         <View style={styles.imgpick}>
                             <Button title="Upload New Photo" onPress={pickImage} />
-                            {image && <Image source={{ uri: image }} style={{ width: 180, height: 150 }} />}
+                            {image && <Image source={{ uri: changeToUrl(image) }} style={{ width: 180, height: 150 }} />}
                         </View>
                         <View style={styles.listBoxContainer}>
 

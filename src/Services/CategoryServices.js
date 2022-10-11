@@ -104,7 +104,44 @@ const CategoryServices = {
                     err => reject(err)
                 )
             })
-        }
+        },
+        getServiceByID : async (service_id) => {
+            return new Promise((resolve,reject)=> {
+                api.call().post(`/get_services_by_id`, {
+                    service_id : service_id
+                }).then(
+                    res => {
+                        const {data} = res
+                        resolve(data)
+                    }
+                ).catch(
+                    err => reject(err)
+                )
+            })
+        },
+        editServiceInfo : async (category_id,subcat_id,service_id,
+            name,photo,display_name,commision,color) => {
+            
+            return new Promise((resolve,reject) => {
+                api.call().post(`edit_service_infor`,{
+                    category_id : category_id,
+                    subcat_id : subcat_id,
+                    service_id : service_id,
+                    name : name,
+                    photo : photo,
+                    display_name : display_name,
+                    commision : commision,
+                    color : color
+                }).then(
+                    res => {
+                        const {data} = res
+                        resolve(data)
+                    }
+                ).catch(
+                    err => reject(err)
+                )
+            })
+            }
     }
 
 
