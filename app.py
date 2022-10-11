@@ -293,7 +293,7 @@ def add_services():
 # Function get serive by category_id
 # Param Request 
 # Return data
-@app.route('/get_services_by_category/<int:category>' , methods = ['GET'])
+@app.route('/get_services_by_category/<int:category>' , methods = ['POST'])
 def get_services_by_category(category):
                 
     # category_list = Services.query.all()
