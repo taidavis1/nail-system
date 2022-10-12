@@ -3,17 +3,30 @@ import { StyleSheet, TouchableOpacity } from 'react-native'
 import { View ,Text} from 'react-native'
 import Ionicon  from '@expo/vector-icons/Ionicons';
 
-export default function Listbox({title, onPress, value}) {
+export default function Listbox({title, onPress, value , readOnly}) {
 
     return (
         <View  style={styles.wrapper}>
             <Text style={styles.txtTitle}>Select {title}</Text>
+        { !readOnly ?
+            (
         <TouchableOpacity style ={styles.container} onPress={onPress}>
             <Text style = {styles.title}>
                 {value}
             </Text>
             <Ionicon name='caret-down-outline' size={25} style={{marginRight : 10}}/>
         </TouchableOpacity>
+            ) :
+            (
+                <View style ={styles.container} >
+            <Text style = {[styles.title,{
+                paddingVertical : 5
+            }]}>
+                {value}
+            </Text>
+        </View>
+            )
+        }
         </View>
     )
 }

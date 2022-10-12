@@ -40,8 +40,8 @@ const CategoryServices = {
     // Services API
     addService: async (displayName, name, price, commision, chooseColor, image, category, subcat) => {
         let formData = new FormData()
-        formData.append('displayName', displayName)
         formData.append('name', name);
+        formData.append('displayName', displayName)
         formData.append('price', price);
         formData.append('commission', commision);
         formData.append('color', chooseColor);
@@ -119,20 +119,21 @@ const CategoryServices = {
                 )
             })
         },
-        editServiceInfo : async (category_id,subcat_id,service_id,
-            name,photo,display_name,commision,color) => {
-            
+        editServiceInfo : async (service_id,name,photo,display_name,commision,color,  price) => {
+                let formData = new FormData()
+                formData.append('service_id',service_id)
+                formData.append('display_name', display_name)
+                formData.append('name', name);
+                formData.append('price', price);
+                formData.append('commision', commision);
+                formData.append('color', color);
+                formData.append("photo", photo ?
+                { uri: photo, name: 'image', type: 'image/jpeg' } : '');
+                const config = {
+                    headers: { 'content-type': 'multipart/form-data' }
+                            }
             return new Promise((resolve,reject) => {
-                api.call().post(`edit_service_infor`,{
-                    category_id : category_id,
-                    subcat_id : subcat_id,
-                    service_id : service_id,
-                    name : name,
-                    photo : photo,
-                    display_name : display_name,
-                    commision : commision,
-                    color : color
-                }).then(
+                api.call().post(`edit_service_infor`,formData,config).then(
                     res => {
                         const {data} = res
                         resolve(data)

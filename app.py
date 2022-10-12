@@ -1,4 +1,5 @@
 from pyclbr import Function
+from webbrowser import get
 from flask import Flask , redirect , render_template , jsonify, url_for, request , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -16,7 +17,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49215/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49207/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -254,15 +255,11 @@ def add_services():
     
     # user_check = user_check.name
     
-    print(display_name,name,price,commision,color,photo,category,subcat)
-    
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], name + ".png")
-    
-    print(image_path)
     
     photo.save(image_path)
 
-    services_add = Services(display_name, name , price , commision , color , image_path,  category , subcat)
+    services_add = Services(name, display_name , price , commision , color , image_path,  category , subcat) #fix luu sai displayname va name
     
     db.session.add(services_add)
     
@@ -424,36 +421,44 @@ def delete_services_by_subcat(category_id, subcat_id):
 @app.route('/edit_service_infor', methods = ['POST'])
 def edit_services():
     
-    category_id = request.json['category_id']
+    # category_id = request.form.get('category_id') -- Khong can dung den catID nua
     
-    subcat_id = request.json['subcat_id']
+    # subcat_id = request.form.get('subcat_id') -- Khong can dung den subCatID nua
     
-    service_id = request.json['service_id']
+    service_id = request.form.get('service_id')
     
-    new_name = request.json['name']
+    new_display_name = request.form.get('display_name')
     
-    # new_photo = request.files['photo']
+    new_name = request.form.get('name')
     
-    # new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name + ".png")
+    new_price = request.form.get('price')
     
-    # new_photo.save(new_image_path)
+    new_commision = request.form.get('commision')
     
-    item = Services.query.filter_by(id = service_id, category = category_id, subCategories = subcat_id)
+    new_color = request.form.get('color')
+
+    new_photo = request.files.get('photo')
+
+    item = Services.query.filter_by(id = service_id).all()
     
     for i in item:
-        item.display_name = request.json['display_name']
+        i.display_name = new_display_name
         
-        item.name = new_name
+        i.name = new_name
+
+        i.price = new_price
         
-        item.price = request.json['price']
+        i.commision = new_commision
         
-        item.commision = request.json['commision']
+        i.color = new_color
         
-        item.color = request.json['color']
+        if new_photo is not None: #anh fix lai cho nay vi sua tu front end de tra photo = None luon
+            
+            new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name + ".png")
         
-        # item.photo = new_image_path
-        
-        db.session.save(item)
+            new_photo.save(new_image_path)
+            
+            i.photo = new_image_path
         
         db.session.commit()
     

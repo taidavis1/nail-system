@@ -10,8 +10,9 @@ import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
-import { addService, getServiceByID } from '../store/slices/Services/serviceAction';
+import { addService, fetchServicesByCat, getServiceByID } from '../store/slices/Services/serviceAction';
 import { baseURL } from '../Services/index';
+import CategoryServices from '../Services/CategoryServices';
 
 export default function Eidtservicemodal({ onPress, isVisible, editService }) {
 
@@ -24,24 +25,25 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }
     // useDispatch to dispatch action from redux
     const dispatch = useDispatch()
-    
+
     useEffect(() => {
-        dispatch(getServiceByID({
-            serviceID : editService?.id
-        })).then(
-            res => {
-                if (res.payload) {
-                    setserviceInfo(res.payload)
-                    setImage(res.payload.photo)
-                    setName(res.payload.name)
-                    setDisplayName(res.payload.display_name)
-                    setChooseColor(res.payload.color)
-                    setCommision(res.payload.commision)
-                    setImage(res.payload.photo)
+        if (editService){
+            dispatch(getServiceByID({
+                serviceID : editService?.id
+            })).then(
+                res => {
+                    if (res.payload) {
+                        setserviceInfo(res.payload)
+                        setName(res.payload.name)
+                        setDisplayName(res.payload.display_name)
+                        setChooseColor(res.payload.color)
+                        setCommision(res.payload.commision)
+                    }
                 }
-            }
-        )
-    }, [isVisible === true])
+            )
+        }
+        
+    }, [isVisible])
 
     // Get data from store REDUX
     const chooseCategoryID = useSelector(state => state.category.chooseCategory)
@@ -64,7 +66,8 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }else {
         currentSubCat = listSubCatByCategory?.filter(item => item.id === choosesubCatID)
     }
-    const [valueSubCat, setvalueSubCat, onClose] = useState()
+    
+    const subCatList = useSelector(state => state.category.subCatList)
 
     // State handle change input
     const [name, setName] = useState()
@@ -76,14 +79,17 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     const [isVisibleCategorySheet, setIsVisibleCategorySheet] = useState(false);
     const [isVisibleSubCatSheet, setisVisibleSubCatSheet] = useState(false)
     const [serviceInfo, setserviceInfo] = useState()
+    
 
     const getInputValue = (value) => {
         setName(value)
     }
+
+    const categoryID = useSelector(state => state.category.currentCategory)
     const clickSave = () => {
         Alert.alert(
             "Alert",
-            "Do you want to save ?",
+            "Do you want to Update ?",
             [
                 {
                     text: "Cancel",
@@ -91,7 +97,13 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                     style: 'destructive'
                 },
                 { text: "OK", onPress: () => {
-                    console.log(chooseColor)
+                    CategoryServices.editServiceInfo(serviceInfo.id,name,image,displayName,commision,chooseColor,price )
+                    .then(
+                        (res) => {
+                            dispatch(fetchServicesByCat({categoryID : categoryID}))
+                        }
+                    )
+                    setImage()
                     onPress()
                 } }
             ]
@@ -166,14 +178,17 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                     <View style={styles.img_listmenu}>
                         <View style={styles.imgpick}>
                             <Button title="Upload New Photo" onPress={pickImage} />
-                            {image && <Image source={{ uri: changeToUrl(image) }} style={{ width: 180, height: 150 }} />}
+                            <Image  source={{ uri: image ? image : changeToUrl(editService?.photo) }} 
+                                    style={{ width: 180, height: 150 }} />
                         </View>
                         <View style={styles.listBoxContainer}>
 
                             <Listbox title={'Category'} onPress={showListCategory} 
-                                    value={currentCategory ? currentCategory?.category_name : ''} />
+                                    value={currentCategory ? currentCategory?.category_name : ''} 
+                                    readOnly/>
                             <Listbox title={'SubCat'} onPress={showListSubCat} 
-                                    value={valueSubCat?.name} />
+                                    readOnly
+                                    value={subCatList? subCatList[0]?.name : ''} />
                         </View>
                     </View>
                     <View style={styles.btnContainer}>
@@ -181,7 +196,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                             <Button type='outline' title={'Cancel'} style={{ marginLeft: 20 }} onPress={onPress} />
                         </View>
                         <View>
-                            <Button title={'Save'} style={{ marginRight: 20 }} onPress={clickSave} />
+                            <Button title={'Update'} style={{ marginRight: 20 }} onPress={clickSave} />
                         </View>
                     </View>
                 </View>
@@ -191,7 +206,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                     offBottomSheet={() => setIsVisibleCategorySheet(false)}
                     chooseCategory={(value) => handleChooseCategory(value)} />
                 <ItemBottomSheet
-                    listItem={listSubCatByCategory}
+                    listItem={subCatList}
                     isVisible={isVisibleSubCatSheet}
                     offBottomSheet={() => setisVisibleSubCatSheet(false)}
                     chooseCategory={(value) => handleChooseSubCat(value)} />

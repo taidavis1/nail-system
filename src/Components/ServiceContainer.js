@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Text, Alert } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteService, fetchServices } from '../store/slices/Services/serviceAction'
+import { deleteService, fetchServices, fetchServicesByCat } from '../store/slices/Services/serviceAction'
 import { FlatList } from 'react-native-gesture-handler'
 import Serviceitem from './ServiceItem'
+import Loadingcontent from './LoadingConten'
 
 
 
 export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
 
     const dispatch = useDispatch()
-    // fetch first time render service item (default fetch all)
+    const currentStateCategory = useSelector(state => state.category.currentCategory)
+    // fetch first time render service item (default fetch by Cat)
     useEffect(() => {
-        dispatch(fetchServices())
-    }, [dispatch])
+        dispatch(fetchServicesByCat({categoryID : currentStateCategory}))
+    }, [currentStateCategory])
     // hide delete and Edit when close modal 
     useEffect(() => {
         if (onFinishEdit === true) {
@@ -73,16 +75,20 @@ export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
             holddingItem={holddingItem} />
     }
 
+    const loading = useSelector(state => state.services.loading)
 
     return (
+        <Loadingcontent loading={loading}>
+
         <View style={styles.servicecontainer}>
             <FlatList
                 numColumns={3}
                 data={renderData}
                 renderItem={renderItem}
                 key={item => item.id}
-            />
+                />
         </View>
+        </Loadingcontent>
     )
 }
 

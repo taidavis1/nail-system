@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, current } from '@reduxjs/toolkit'
 import { fetchCategory } from './categoryAction'
 
 export const categorySlice = createSlice({
@@ -11,11 +11,13 @@ export const categorySlice = createSlice({
     loading : false,
     message : '',
     currentSubCat : null,
+    subCatList : []
   },
   reducers: {
     addCurrentCategoryID: (state,action) => {
       const {id} = action.payload
         state.currentCategory = id
+        state.subCatList = current(state.category).filter(item => item.id === id)[0].subCategories
       },
     addCurrentSubCatID : (state,action) => {
       const {id} = action.payload

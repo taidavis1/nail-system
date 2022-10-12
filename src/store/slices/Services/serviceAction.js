@@ -57,3 +57,11 @@ export const getServiceByID = createAsyncThunk(
         return response
     }
 )
+
+export const editServiceInfo = createAsyncThunk(
+    'services/editServiceInfo',
+    async ( data, thunkAPI) => {
+        console.log(data)
+        
+    }
+)

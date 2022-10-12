@@ -50,10 +50,10 @@ export default function Servicescreen(props) {
     const toggleModal_Service = () => {
         setisVisible_Services(!isVisible_Service)
     }
-    const toggleModal_EditService = (itemID,item) => {
+
+    const toggleModal_EditService = (item) => {
         seteditService(item)
         setisVisible_EditService(!isVisible_EditService)
-
     }
     const clickCategory = (categoryname, id) => {
         switch (categoryname) {

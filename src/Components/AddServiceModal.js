@@ -38,7 +38,13 @@ export default function Addservicemodal({ onPress, isVisible }) {
     }else {
         currentSubCat = listSubCatByCategory?.filter(item => item.id === choosesubCatID)
     }
-    const [valueSubCat, setvalueSubCat, onClose] = useState()
+    const subCatList = useSelector(state => state.category.subCatList)
+    useEffect(() => {
+        if (subCatList) {
+            setvalueSubCat(subCatList[0])
+        }
+    }, [subCatList])
+    const [valueSubCat, setvalueSubCat] = useState()
     
     // State handle change input
     const [name, setName] = useState()
@@ -62,7 +68,7 @@ export default function Addservicemodal({ onPress, isVisible }) {
                 {
                     text: "Cancel",
                     onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
+                    style: "destructive"
                 },
                 { text: "OK", onPress: () => {
                     dispatch(addService({
@@ -75,7 +81,7 @@ export default function Addservicemodal({ onPress, isVisible }) {
                         chooseCategoryID : chooseCategoryID,
                         valueSubCat : valueSubCat.id
                     }))
-                    setImage()
+                    setImage('')
                     setvalueSubCat()
                     onPress()
                 } }
