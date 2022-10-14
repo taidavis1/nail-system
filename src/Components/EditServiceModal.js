@@ -87,7 +87,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }
 
     const categoryID = useSelector(state => state.category.currentCategory)
-    const subCatInfo = subCatList?.filter(item => item.id === serviceInfo.subcat_id)[0]
+    const subCatInfo = subCatList?.filter(item => item.id === serviceInfo?.subcat_id)[0]
     const clickSave = () => {
         Alert.alert(
             "Alert",

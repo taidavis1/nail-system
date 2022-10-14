@@ -4,7 +4,6 @@ import ReactNativeModal from 'react-native-modal'
 import { Button } from "@rneui/themed";
 import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
-import CategoryServices from '../Services/CategoryServices';
 import { useSelector, useDispatch } from 'react-redux';
 import Loadingcontent from './LoadingConten';
 import { addSubCat, fetchCategory } from '../store/slices/Category/categoryAction';
