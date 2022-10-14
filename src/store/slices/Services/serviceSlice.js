@@ -54,8 +54,8 @@ export const servicesSlice = createSlice({
         },
         [addService.fulfilled] : (state, action) => {
             const currentServiceList = current(state).serviceList
-            const newList = [...currentServiceList,action.payload[0]]
-            state.serviceList = newList
+            // const newList = [...currentServiceList,action.payload[0]]
+            // state.serviceList = newList
             state.loading = false
             state.message = 'Success'
         },

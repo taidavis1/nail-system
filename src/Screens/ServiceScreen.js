@@ -98,13 +98,15 @@ export default function Servicescreen(props) {
                     },
                     {
                         text: "OK", onPress: () => {
+                            const listAfterDelete = SubCatdata.filter(item => item.id !== id)
+                            const newSubCatActive = listAfterDelete[0]
                                 dispatch(deleteSubCat({subcat_id : currenSubCatID}))
                                 .then(
-                                    res => {
+                                    () => {
                                         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
                                         dispatch(fetchsServicesBySubCat({
                                             categoryID : currentCategoryID,
-                                            subCatID : currenSubCatID
+                                            subCatID : newSubCatActive.id
                                         }))
                                     }
                                 )

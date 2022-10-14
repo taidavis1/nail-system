@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Dimensions, Image, Text, Alert } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteService, fetchServices, fetchServicesByCat } from '../store/slices/Services/serviceAction'
+import { deleteService, fetchsServicesBySubCat } from '../store/slices/Services/serviceAction'
 import { FlatList } from 'react-native-gesture-handler'
 import Serviceitem from './ServiceItem'
 import Loadingcontent from './LoadingConten'
@@ -12,10 +12,11 @@ export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
 
     const dispatch = useDispatch()
     const currentStateCategory = useSelector(state => state.category.currentCategory)
+    const subCatIDNow = useSelector(state => state.category.currentSubCat)
     // fetch first time render service item (default fetch by Cat)
     useEffect(() => {
         if (currentStateCategory) {
-            dispatch(fetchServicesByCat({categoryID : currentStateCategory}))
+            dispatch(fetchsServicesBySubCat({categoryID : currentStateCategory,subCatID : subCatIDNow}))
         }
     }, [currentStateCategory])
     // hide delete and Edit when close modal 

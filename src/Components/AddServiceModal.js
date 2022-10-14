@@ -10,7 +10,7 @@ import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
-import { addService } from '../store/slices/Services/serviceAction';
+import { addService, fetchsServicesBySubCat } from '../store/slices/Services/serviceAction';
 import Loadingcontent from './LoadingConten';
 
 export default function Addservicemodal({ onPress, isVisible }) {
@@ -38,10 +38,15 @@ export default function Addservicemodal({ onPress, isVisible }) {
     }else {
         currentSubCat = listSubCatByCategory?.filter(item => item.id === choosesubCatID)
     }
+    const subCatIDNow = useSelector(state =>  state.category.currentSubCat)
+    const catIDNow = useSelector(state => state.category.currentCategory)
     const subCatList = useSelector(state => state.category.subCatList)
+    
     useEffect(() => {
         if (subCatList) {
-            setvalueSubCat(subCatList[0])
+            const subCatData = subCatList.filter(item => item.id === subCatIDNow)
+            
+            setvalueSubCat(subCatData[0])
         }
     }, [subCatList])
     const [valueSubCat, setvalueSubCat] = useState()
@@ -80,7 +85,14 @@ export default function Addservicemodal({ onPress, isVisible }) {
                         image : image,
                         chooseCategoryID : chooseCategoryID,
                         valueSubCat : valueSubCat.id
-                    }))
+                    })).then(
+                        () => {
+                            dispatch(fetchsServicesBySubCat({
+                                categoryID : catIDNow,
+                                subCatID : subCatIDNow
+                            }))
+                        }
+                    )
                     setImage('')
                     setvalueSubCat()
                     onPress()

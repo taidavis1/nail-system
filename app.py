@@ -311,9 +311,13 @@ def get_services_by_id():
     
     category_list = Services.query.filter_by(id = id).first()
     
-    print(category_list)
+    print(category_list.category)
             
     all_data = service_sche.dump(category_list)
+    
+    all_data['category'] = category_list.category
+    
+    all_data['subcat_id'] = category_list.subCategories
         
     return jsonify(all_data)
 

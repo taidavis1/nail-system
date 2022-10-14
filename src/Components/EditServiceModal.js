@@ -10,7 +10,7 @@ import ItemBottomSheet from './BottomSheet';
 import Listbox from './ListBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChooseCategory, addChooseSubCat } from '../store/slices/Category/categorySlice';
-import { addService, fetchServicesByCat, getServiceByID } from '../store/slices/Services/serviceAction';
+import {  fetchServicesByCat, getServiceByID } from '../store/slices/Services/serviceAction';
 import { baseURL } from '../Services/index';
 import CategoryServices from '../Services/CategoryServices';
 
@@ -38,6 +38,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                         setDisplayName(res.payload.display_name)
                         setChooseColor(res.payload.color)
                         setCommision(res.payload.commision)
+                        setPrice(res.payload.price)
                     }
                 }
             )
@@ -86,6 +87,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     }
 
     const categoryID = useSelector(state => state.category.currentCategory)
+    const subCatInfo = subCatList?.filter(item => item.id === serviceInfo.subcat_id)[0]
     const clickSave = () => {
         Alert.alert(
             "Alert",
@@ -97,7 +99,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                     style: 'destructive'
                 },
                 { text: "OK", onPress: () => {
-                    CategoryServices.editServiceInfo(serviceInfo.id,name,image,displayName,commision,chooseColor,price )
+                    CategoryServices.editServiceInfo(serviceInfo.id,name,image,displayName,commision,chooseColor,Number(price) )
                     .then(
                         (res) => {
                             dispatch(fetchServicesByCat({categoryID : categoryID}))
@@ -188,7 +190,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
                                     readOnly/>
                             <Listbox title={'SubCat'} onPress={showListSubCat} 
                                     readOnly
-                                    value={subCatList? subCatList[0]?.name : ''} />
+                                    value={subCatInfo?.name} />
                         </View>
                     </View>
                     <View style={styles.btnContainer}>
