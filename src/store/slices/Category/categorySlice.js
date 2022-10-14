@@ -94,8 +94,7 @@ export const categorySlice = createSlice({
       const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
       state.subCatList = newList
       if (newList){
-
-        state.currentCategory = newList[0].id
+        state.currentSubCat = newList[0].id
       }
     }
   }
