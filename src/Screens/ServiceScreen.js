@@ -106,10 +106,14 @@ export default function Servicescreen(props) {
 
     // function handle add subcat : 
     const handleAddSubCat = () => {
-        if (currenSubCatID) {
             setisVisible_SubCat(true)
+    }
+    // function handle EditSubCat :
+    const handleEditSubCat = () => {
+        if (currenSubCatID) {
+            setisVisible_EditSubCat(true)
         }else {
-            alert('Must choose a category')
+            alert('Must choose a SubCat')
         }
     }
     // Action to handle swipeRight
@@ -219,7 +223,7 @@ export default function Servicescreen(props) {
                         }]}
                             onPress={() => handleDeleteSubCat()}><Icon size={27} type='ionicon' name='trash-outline' style={styles.addSubCat} /></TouchableOpacity>
                         <TouchableOpacity style={styles.addSubCatContainer}
-                            onPress={() => setisVisible_EditSubCat(true)}><Icon size={27} type='ionicon' name='create-outline' style={styles.addSubCat} /></TouchableOpacity>
+                            onPress={() => handleEditSubCat()}><Icon size={27} type='ionicon' name='create-outline' style={styles.addSubCat} /></TouchableOpacity>
                         <TouchableOpacity style={[styles.addSubCatContainer,{
                             backgroundColor :'#74b9ff'
                         }]}
