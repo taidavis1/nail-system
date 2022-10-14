@@ -8,6 +8,9 @@ export const servicesSlice = createSlice({
         loading: false,
     },
     reducers: {
+        resetServiceList : (state) => {
+            state.serviceList = []
+        }
     },
     extraReducers: {
         [fetchServices.pending]: (state) => {
@@ -93,6 +96,6 @@ export const servicesSlice = createSlice({
 })
 
 
-export const { } = servicesSlice.actions
+export const { resetServiceList} = servicesSlice.actions
 
 export default servicesSlice.reducer

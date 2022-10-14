@@ -20,6 +20,7 @@ import Ionicon from '@expo/vector-icons/Ionicons';
 import Loadingcontent from '../Components/LoadingConten';
 import Editcategorymodal from '../Components/EditCategoryModal';
 import EditsubcatModal from '../Components/EditSubCatModal';
+import { resetServiceList } from '../store/slices/Services/serviceSlice';
 
 
 
@@ -64,7 +65,9 @@ export default function Servicescreen(props) {
                 {
                     text: "OK", onPress: () => {
                         dispatch(deleteCategory({ category_id: category.id }))
-                        .then(res => console.log(res))
+                        .then(
+                            dispatch(resetServiceList())
+                        )
                     }
                 }
             ]
@@ -96,6 +99,15 @@ export default function Servicescreen(props) {
                     {
                         text: "OK", onPress: () => {
                                 dispatch(deleteSubCat({subcat_id : currenSubCatID}))
+                                .then(
+                                    res => {
+                                        dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
+                                        dispatch(fetchsServicesBySubCat({
+                                            categoryID : currentCategoryID,
+                                            subCatID : currenSubCatID
+                                        }))
+                                    }
+                                )
                             
                         }
                     }

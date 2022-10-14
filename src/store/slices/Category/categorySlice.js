@@ -16,8 +16,8 @@ export const categorySlice = createSlice({
   reducers: {
     addCurrentCategoryID: (state,action) => {
       const {id} = action.payload
-        state.currentCategory = id
-        state.subCatList = current(state.category).filter(item => item.id === id)[0]?.subCategories
+      state.currentCategory = id
+      state.subCatList = current(state.category).filter(item => item.id === id)[0]?.subCategories
       },
     addCurrentSubCatID : (state,action) => {
       const {id} = action.payload
@@ -25,8 +25,6 @@ export const categorySlice = createSlice({
     },
     addChooseCategory : (state,action) => {
       state.chooseCategory = action.payload.categoryID
-      const listCurrenCat = current(state.category)?.filter(item => item.id === action.payload.categoryID)[0]
-      state.subCatList = listCurrenCat?.subCategories
       state.chooseSubCat = current(state.subCatList)? current(state.subCatList)[0]?.id : null
       state.currentSubCat = current(state.subCatList)? current(state.subCatList)[0]?.id : null
     },
