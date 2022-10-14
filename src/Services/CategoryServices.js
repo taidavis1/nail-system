@@ -178,6 +178,15 @@ const CategoryServices = {
                         err => reject(err)
                     )
                 })
+            },
+            editSubCatInfo : async(subcat_id, name) => {
+                return new Promise((resolve, reject) => {
+                    api.call().post(`edit_subcat_info`,{
+                        subcat_id : subcat_id,
+                        name : name
+                    }).then(res => resolve(res.data))
+                    .catch(err => reject(err))
+                })
             }
     }
 

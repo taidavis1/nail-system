@@ -20,7 +20,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49407/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49225/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -451,6 +451,31 @@ def edit_category():
     new_item = Category.query.filter_by(id = category_id).all() #query to get cat after edited
 
     data = cats_sche.dump(new_item)
+
+    return jsonify(data)
+
+# Function Edit SubCat Info
+# Params Request 
+# Return data 
+@app.route('/edit_subcat_info',methods = ['POST']) #Tuong111 bo sung route de update subcat info
+def edit_subCat():
+
+    subcat_id = request.json['subcat_id']
+
+    new_name = request.json['name']
+
+    item = Subcat.query.filter_by(id = subcat_id).all()
+
+    for i in item :
+        i.name = new_name
+
+        db.session.commit()
+
+    new_item = Subcat.query.filter_by(id = subcat_id).all() #query to get subcat after edited
+
+    data = sub_sche.dump(new_item)
+
+    print(data)
 
     return jsonify(data)
 

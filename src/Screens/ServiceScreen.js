@@ -19,6 +19,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import Ionicon from '@expo/vector-icons/Ionicons';
 import Loadingcontent from '../Components/LoadingConten';
 import Editcategorymodal from '../Components/EditCategoryModal';
+import EditsubcatModal from '../Components/EditSubCatModal';
 
 
 
@@ -29,7 +30,7 @@ export default function Servicescreen(props) {
     const [isVisible_EditCat, setisVisible_EditCat] = useState(false)
     // Toggle Modal SubCat
     const [isVisible_SubCat, setisVisible_SubCat] = useState(false)
-
+    const [isVisible_EditSubCat, setisVisible_EditSubCat] = useState(false)
     // Toggle Modal Service
     const [isVisible_Service, setisVisible_Services] = useState(false)
     const [isVisible_EditService, setisVisible_EditService] = useState(false)
@@ -47,7 +48,7 @@ export default function Servicescreen(props) {
 
     useEffect(() => {
         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
-    }, [dispatch, isModalVisible, isVisible_SubCat, isVisible_Service])
+    }, [dispatch, isModalVisible, isVisible_Service, isVisible_SubCat,isVisible_EditSubCat])
 
     // Function handle DeleteCategory :
     const handleDeleteCat = (category) => {
@@ -77,16 +78,18 @@ export default function Servicescreen(props) {
 
     // function handle delete subcat :
     const handleDeleteSubCat = () =>{
+
         if (!currenSubCatID) {
             alert('Must choose a subCat')
         }else{
+            const deleteSubCatItem = SubCatdata.filter(item => item.id === currenSubCatID)
+            const {name , id} = deleteSubCatItem[0]
             Alert.alert(
                 "Alert",
-                `Do you wanna Delete ${currenSubCatID}`,
+                `Do you wanna Delete ${name}`,
                 [
                     {
                         text: "Cancel",
-                        onPress: () => console.log("Cancel Pressed"),
                         style: 'destructive'
                     },
                     {
@@ -99,6 +102,15 @@ export default function Servicescreen(props) {
             )
         }
         
+    }
+
+    // function handle add subcat : 
+    const handleAddSubCat = () => {
+        if (currenSubCatID) {
+            setisVisible_SubCat(true)
+        }else {
+            alert('Must choose a category')
+        }
     }
     // Action to handle swipeRight
     const renderRightActions = (item) => {
@@ -135,7 +147,9 @@ export default function Servicescreen(props) {
     const toggleModal_SubCat = () => {
         setisVisible_SubCat(!isVisible_SubCat)
     }
-    
+    const toggleModal_EditSubCat = () => {
+        setisVisible_EditSubCat(!isVisible_EditSubCat)
+    }
     // handle show,hide service model
     const toggleModal_Service = () => {
         setisVisible_Services(!isVisible_Service)
@@ -176,6 +190,7 @@ export default function Servicescreen(props) {
             <Addcategorymodal isVisible={isModalVisible} onPress={toggleModal} />
             <Editcategorymodal isVisible={isVisible_EditCat} onPress={toggleModel_EditCat} category={category}/>
             <Addsubcatmodal isVisible={isVisible_SubCat} onPress={toggleModal_SubCat} />
+            <EditsubcatModal isVisible={isVisible_EditSubCat} onPress={toggleModal_EditSubCat}/>
             <Addservicemodal isVisible={isVisible_Service} onPress={toggleModal_Service} />
             <Eidtservicemodal isVisible={isVisible_EditService} onPress={toggleModal_EditService} editService={editService} />
             <HeaderBase screenName={'Service'} />
@@ -204,11 +219,11 @@ export default function Servicescreen(props) {
                         }]}
                             onPress={() => handleDeleteSubCat()}><Icon size={27} type='ionicon' name='trash-outline' style={styles.addSubCat} /></TouchableOpacity>
                         <TouchableOpacity style={styles.addSubCatContainer}
-                            onPress={() => setisVisible_SubCat(true)}><Icon size={27} type='ionicon' name='create-outline' style={styles.addSubCat} /></TouchableOpacity>
+                            onPress={() => setisVisible_EditSubCat(true)}><Icon size={27} type='ionicon' name='create-outline' style={styles.addSubCat} /></TouchableOpacity>
                         <TouchableOpacity style={[styles.addSubCatContainer,{
                             backgroundColor :'#74b9ff'
                         }]}
-                            onPress={() => setisVisible_SubCat(true)}><Icon size={27} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
+                            onPress={() => handleAddSubCat()}><Icon size={27} type='ionicon' name='add' style={styles.addSubCat} /></TouchableOpacity>
                     </View>
                     <View style={styles.subCatServices}>
                         <Servicecontainer onPress={() => setisVisible_Services(true)}

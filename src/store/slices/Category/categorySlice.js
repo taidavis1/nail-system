@@ -40,11 +40,14 @@ export const categorySlice = createSlice({
     },
     [fetchCategory.fulfilled] : (state,{payload}) => {
       state.category = payload.response
-      // state.currentCategory = !state.currentCategory ? payload.response[0].id : payload.currentID 
-      // state.chooseCategory = !state.chooseCategory ? payload.response[0].id : state.chooseCategory
-      // state.currentSubCat = !state.currentSubCat ? payload.response[0].subCategories[0].id: payload.currentSubCatID
-      // const currentCategoryClone = current(state.category) 
-      // console.log('redux current CAT',currentCategoryClone)
+      const currentList = current(state).category
+      if (payload.currentID && currentList) { 
+        const currentCatList = currentList.filter(item => item.id === payload.currentID)
+        const listSubCat = currentCatList[0].subCategories
+        if (listSubCat) {
+          state.subCatList = listSubCat
+        }
+      }
       state.loading = false
       state.message = 'Success'
     },

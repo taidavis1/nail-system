@@ -25,7 +25,6 @@ export const addSubCat = createAsyncThunk(
     async (data, thunkAPI) =>{
         const {name, category} = data
         const res = await CategoryServices.addSubCat(name,category)
-        console.log(res)
         return res
     }
 )
@@ -53,7 +52,15 @@ export const deleteSubCat = createAsyncThunk(
         }
     }
 )
-    
+
+export const editSubCat = createAsyncThunk(
+    'category/editSubCat',
+    async(data, thunkAPI) => {
+        const {subcat_id,name} = data
+        const res = await CategoryServices.editSubCatInfo(subcat_id,name)
+        return res
+    }
+)
 
 export const editCategory = createAsyncThunk(
     'category,editCategory',

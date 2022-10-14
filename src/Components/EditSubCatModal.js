@@ -1,30 +1,47 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, View } from 'react-native'
 import ReactNativeModal from 'react-native-modal'
 import { Button } from "@rneui/themed";
 import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
-import CategoryServices from '../Services/CategoryServices';
 import { useSelector, useDispatch } from 'react-redux';
 import Loadingcontent from './LoadingConten';
-import { addSubCat, fetchCategory } from '../store/slices/Category/categoryAction';
+import { editSubCat } from '../store/slices/Category/categoryAction';
 
 
-export default function Addsubcatmodal({ onPress, isVisible }) {
+export default function EditsubcatModal({ onPress, isVisible }) {
     const [subCatName, setSubCatName] = useState()
-    const currentCategoryID = useSelector(state => state.category.currentCategory)
+    // const currentCategoryID = useSelector(state => state.category.currentCategory)
+    const currentSubCatID = useSelector(state => state.category.currentSubCat)
+    const subCatList = useSelector(state => state.category.subCatList)
+    const currentSubCatData = subCatList.filter(item => item.id === currentSubCatID)
     const getInputValue = (value) => {
         setSubCatName(value)
     }
     const dispatch = useDispatch()
-    const clickSave = () => {
-        dispatch(addSubCat({
-            name : subCatName,
-            category : currentCategoryID
-        })).then(
-            res => {
-                onPress()
-            }
+    const clickUpdate = () => {
+        Alert.alert(
+            "Alert",
+            `Do you wanna Update`,
+            [
+                {
+                    text: "Cancel",
+                    style: 'destructive'
+                },
+                {
+                    text: "OK", onPress: () => {
+                            dispatch(editSubCat({
+                                subcat_id : currentSubCatID,
+                                name : !subCatName ? currentSubCatData[0]?.name : subCatName
+                            })).then(
+                                res => {
+                                    onPress()
+                                }
+                            )
+                        
+                    }
+                }
+            ]
         )
     }
     const loading = useSelector(state => state.category.loading)
@@ -33,16 +50,18 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
             <Loadingcontent loading={loading}>
             <ReactNativeModal isVisible={isVisible} style={styles.modalContainer} backdropOpacity={0.3}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>Add New SubCat</Text>
+                    <Text style={styles.title}>Eidt SubCat</Text>
                     <View style={styles.inputContainer}>
-                        <Forminput label={'SubCategory Name'} help={'Example'} onChange={(value) => getInputValue(value)}/>
+                        <Forminput  label={'SubCategory Name'} help={'Example'} 
+                                    onChange={(value) => getInputValue(value)}
+                                    defaultValue={currentSubCatData[0]?.name}/>
                     </View>
                     <View style={styles.btnContainer}>
                         <View>
                             <Button type='outline' title={'Cancel'} style={{ marginLeft: 20 }} onPress={onPress} />
                         </View>
                         <View>
-                            <Button title={'Save'} style={{ marginRight: 20 }} onPress={clickSave}/>
+                            <Button title={'Update'} style={{ marginRight: 20 }} onPress={clickUpdate}/>
                         </View>
 
                     </View>
