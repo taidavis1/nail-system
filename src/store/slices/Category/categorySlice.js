@@ -64,6 +64,7 @@ export const categorySlice = createSlice({
       const currentCategoryList = current(state.category)
       const newList = currentCategoryList?.filter(item => item.id !== action.payload.category_id)
       state.category = newList 
+      state.subCatList = []
     },
     [deleteCategory.rejected] :(state) => {
       state.loading = false

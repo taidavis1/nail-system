@@ -144,6 +144,7 @@ const CategoryServices = {
             })
             },
             deleteCategory : async(category_id) => {
+                console.log(category_id)
                 return new Promise((resolve,reject)=> {
                     api.call().post(`/delete_category`,{
                         category_id : category_id

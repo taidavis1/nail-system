@@ -64,6 +64,7 @@ export default function Servicescreen(props) {
                 {
                     text: "OK", onPress: () => {
                         dispatch(deleteCategory({ category_id: category.id }))
+                        .then(res => console.log(res))
                     }
                 }
             ]

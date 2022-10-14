@@ -386,7 +386,7 @@ def delete_subcat():
 
 
 @app.route('/delete_category', methods = ['POST'])
-def delete_category(id):
+def delete_category(): #fix khong truyen id vao vi da lay truc tiep json tu req
     
     category_id = request.json['category_id']
     

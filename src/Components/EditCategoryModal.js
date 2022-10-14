@@ -24,9 +24,6 @@ export default function Editcategorymodal({ onPress, isVisible, category }) {
     }
     const dispatch = useDispatch()
     const clickUpdate = () => {
-        if(chooseColor === 'rgb(0,0,0)'){
-            setChooseColor(category.color)
-        }
         Alert.alert(
             "Alert",
             "Do you want to Update ?",
@@ -40,7 +37,7 @@ export default function Editcategorymodal({ onPress, isVisible, category }) {
                     dispatch(editCategory({
                         category_id : category.id,
                         name : catagoryName,
-                        color : chooseColor
+                        color : chooseColor=== 'rgb(0,0,0)' ? category.color : chooseColor
                     })).then(
                         onPress()
                     )
