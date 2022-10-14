@@ -1,4 +1,5 @@
 from pyclbr import Function
+from unicodedata import category
 from webbrowser import get
 from flask import Flask , redirect , render_template , jsonify, url_for, request , flash
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +10,8 @@ import json
 import os
 import sys
 import random
+
+from sqlalchemy import JSON
 # import cv2
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +20,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
 
 app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49207/nailsapp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49407/nailsapp'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -292,8 +295,6 @@ def get_services_by_category(category):
     # category_list = Services.query.all()
     
     category_list = Services.query.filter_by(category = category).all()
-    
-    print(category_list)
             
     all_data = services_sche.dump(category_list)
         
@@ -360,6 +361,8 @@ def delete_service():
 def delete_subcat():
     
     id = request.json['subcat_id']
+
+    print(id)
     
     if id == '':
         
@@ -383,22 +386,32 @@ def delete_subcat():
 
 
 @app.route('/delete_category', methods = ['POST'])
-def delete_category():
+def delete_category(id):
     
-    subcat_id = request.json['subcat_id']
+    category_id = request.json['category_id']
     
-    if subcat_id == '':
+    if category_id == '':
         
         return('param missing')
     else:
     
-        item = Subcat.query.filter_by(id = subcat_id).first()
+        services = Services.query.filter_by(category = category_id).all()
         
-        db.session.delete(item)
+        for i in services:
+            db.session.delete(i)
+        
+        subcats = Subcat.query.filter_by(category = category_id).all()
+        
+        for i in subcats:
+            db.session.delete(i)
+        
+        category = Category.query.filter_by(id = category_id).first()
+        
+        db.session.delete(category)
         
         db.session.commit()
         
-        return jsonify('successfully delete subcat')
+        return jsonify('successfully delete category')
 
 # Function delete services by subcat_id 
 # Params int + int 
@@ -414,6 +427,32 @@ def delete_services_by_subcat(category_id, subcat_id):
     
     return('success')
 
+# Function Edit Category Info
+# Params Request 
+# Return data 
+@app.route('/edit_category_info',methods = ['POST']) #Tuong111 bo sung route de update cat info
+def edit_category():
+
+    category_id = request.json['category_id']
+
+    new_name = request.json['name']
+
+    new_color = request.json['color']
+
+    item = Category.query.filter_by(id = category_id).all()
+
+    for i in item :
+        i.category_name = new_name
+
+        i.color = new_color
+
+        db.session.commit()
+
+    new_item = Category.query.filter_by(id = category_id).all() #query to get cat after edited
+
+    data = cats_sche.dump(new_item)
+
+    return jsonify(data)
 
 # Function Edit Services
 # Params Request 

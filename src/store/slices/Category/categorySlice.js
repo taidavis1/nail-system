@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
-import { fetchCategory } from './categoryAction'
+import { deleteCategory, deleteSubCat, editCategory, fetchCategory } from './categoryAction'
 
 export const categorySlice = createSlice({
   name: 'category',
@@ -17,7 +17,7 @@ export const categorySlice = createSlice({
     addCurrentCategoryID: (state,action) => {
       const {id} = action.payload
         state.currentCategory = id
-        state.subCatList = current(state.category).filter(item => item.id === id)[0].subCategories
+        state.subCatList = current(state.category).filter(item => item.id === id)[0]?.subCategories
       },
     addCurrentSubCatID : (state,action) => {
       const {id} = action.payload
@@ -25,6 +25,10 @@ export const categorySlice = createSlice({
     },
     addChooseCategory : (state,action) => {
       state.chooseCategory = action.payload.categoryID
+      const listCurrenCat = current(state.category)?.filter(item => item.id === action.payload.categoryID)[0]
+      state.subCatList = listCurrenCat?.subCategories
+      state.chooseSubCat = current(state.subCatList)? current(state.subCatList)[0]?.id : null
+      state.currentSubCat = current(state.subCatList)? current(state.subCatList)[0]?.id : null
     },
     addChooseSubCat : (state,action) => {
       state.chooseSubCat = action.payload.subCatID
@@ -35,16 +39,61 @@ export const categorySlice = createSlice({
       state.loading = true
     },
     [fetchCategory.fulfilled] : (state,{payload}) => {
-      state.category = payload.response,
-      state.currentCategory = !state.currentCategory ? payload.response[0].id : payload.currentID ,
-      state.chooseCategory = !state.chooseCategory ? payload.response[0].id : state.chooseCategory,
-      state.currentSubCat = !state.currentSubCat ? payload.response[0].subCategories[0].id: payload.currentSubCatID
+      state.category = payload.response
+      // state.currentCategory = !state.currentCategory ? payload.response[0].id : payload.currentID 
+      // state.chooseCategory = !state.chooseCategory ? payload.response[0].id : state.chooseCategory
+      // state.currentSubCat = !state.currentSubCat ? payload.response[0].subCategories[0].id: payload.currentSubCatID
+      // const currentCategoryClone = current(state.category) 
+      // console.log('redux current CAT',currentCategoryClone)
       state.loading = false
       state.message = 'Success'
     },
     [fetchCategory.rejected] : (state) => {
       state.loading = false,
       state.message = 'Fail Request!'
+    },
+    [deleteCategory.pending] : (state) => {
+      state.loading = true
+    },
+    [deleteCategory.fulfilled] : (state, action) => {
+      state.loading = false
+      state.message = 'Success'
+      const currentCategoryList = current(state.category)
+      const newList = currentCategoryList?.filter(item => item.id !== action.payload.category_id)
+      state.category = newList 
+    },
+    [deleteCategory.rejected] :(state) => {
+      state.loading = false
+      state.message = 'Fail Request!'
+    }, 
+    [editCategory.pending] : (state) => {
+      state.loading = true
+    },
+    [editCategory.fulfilled] : (state, action) => {
+      state.loading = false
+      const currentList = [...current(state.category)]
+      // replace old item by new item
+      let index = currentList.map(el => el.id).indexOf(action.payload.category_id)
+      const newItem = action.payload.res[0]
+      currentList[index] = newItem
+      state.category = currentList
+    },
+    [editCategory.rejected] : (state) => {
+      state.loading = false
+      state.message  = 'Fail Request!'
+    },
+    [deleteSubCat.pending] : (state) => {
+      state.loading = true
+    },
+    [deleteSubCat.fulfilled] : (state,action) => {
+      state.loading = false
+      const currentSubCatList = current(state.subCatList)
+      const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
+      state.subCatList = newList
+      if (newList){
+
+        state.currentCategory = newList[0].id
+      }
     }
   }
 })

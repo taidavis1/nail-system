@@ -16,6 +16,10 @@ const COLORS = [
 function mapColorNumToString(nums) {
     return `rgb(${nums[0].toString()},${nums[1].toString()},${nums[2].toString()})`;
 }
+function mapStringToColorNum(String){
+    let arr = []
+    // rgb(1,2,3)
+}
 function calcLinear(scale, first, second) {
     return first + scale * (second - first);
 }
@@ -59,6 +63,7 @@ const RgbColorPicker = ({ categoryname,containerStyle, barStyle,
     const selectedColor = useRef(new Animated.Value(0)).current;
     const [colorSlide, setColorSlide] = useState(initialColorSlider ? initialColorSlider * width : 0);
     const [color, setColor] = useState(initialColor || [0, 0, 0]);
+    
 
     useEffect(() => {
         getColorFromColorPicker(mapColorNumToString(color))

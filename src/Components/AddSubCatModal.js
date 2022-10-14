@@ -5,8 +5,9 @@ import { Button } from "@rneui/themed";
 import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
 import CategoryServices from '../Services/CategoryServices';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Loadingcontent from './LoadingConten';
+import { addSubCat } from '../store/slices/Category/categoryAction';
 
 
 export default function Addsubcatmodal({ onPress, isVisible }) {
@@ -15,14 +16,12 @@ export default function Addsubcatmodal({ onPress, isVisible }) {
     const getInputValue = (value) => {
         setSubCatName(value)
     }
+    const dispatch = useDispatch()
     const clickSave = () => {
-        CategoryServices.addSubCat(subCatName,`${currentCategoryID}`)
-        .then(res => {
-            console.log(res)
-            onPress()
-        })
-        .catch(err => console.log(err))
-
+        dispatch(addSubCat({
+            name : subCatName,
+            category : currentCategoryID
+        }))
     }
     const loading = useSelector(state => state.category.loading)
     return (

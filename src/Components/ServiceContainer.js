@@ -14,7 +14,9 @@ export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
     const currentStateCategory = useSelector(state => state.category.currentCategory)
     // fetch first time render service item (default fetch by Cat)
     useEffect(() => {
-        dispatch(fetchServicesByCat({categoryID : currentStateCategory}))
+        if (currentStateCategory) {
+            dispatch(fetchServicesByCat({categoryID : currentStateCategory}))
+        }
     }, [currentStateCategory])
     // hide delete and Edit when close modal 
     useEffect(() => {

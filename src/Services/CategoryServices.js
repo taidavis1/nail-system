@@ -142,6 +142,42 @@ const CategoryServices = {
                     err => reject(err)
                 )
             })
+            },
+            deleteCategory : async(category_id) => {
+                return new Promise((resolve,reject)=> {
+                    api.call().post(`/delete_category`,{
+                        category_id : category_id
+                    }).then(
+                        res =>{
+                            resolve(res.data)
+                        }
+                    ).catch(
+                        err => reject(err)
+                    )
+                })
+            },
+            editCategoryInfo : async(category_id, name, color) => {
+                return new Promise((resolve,reject) => {
+                    api.call().post(`edit_category_info`,{
+                        category_id : category_id,
+                        name : name,
+                        color : color
+                    }).then(res =>resolve(res.data)
+                    ).catch(err => reject(err))
+                })
+            },
+            deleteSubCat : async(subcat_id) => {
+                return new Promise((resolve,reject)=> {
+                    api.call().post(`/delete_subcat`,{
+                        subcat_id : subcat_id
+                    }).then(
+                        res => {
+                            resolve(res.data)
+                        }
+                    ).catch(
+                        err => reject(err)
+                    )
+                })
             }
     }
 

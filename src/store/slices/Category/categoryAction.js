@@ -19,3 +19,50 @@ export const addCategory = createAsyncThunk(
         return response
     }
 )
+
+export const addSubCat = createAsyncThunk(
+    'category/addSubCat',
+    async (data, thunkAPI) =>{
+        const {name, category} = data
+        const res = await CategoryServices.addSubCat(name,category)
+        console.log(res)
+        return res
+    }
+)
+
+export const deleteCategory = createAsyncThunk(
+    'category/deleteCategory',
+    async (data, thunkAPI) => {
+        const {category_id} = data
+        const response = await CategoryServices.deleteCategory(category_id)
+        return {
+            response,
+            category_id : category_id
+        }
+    }
+)
+
+export const deleteSubCat = createAsyncThunk(
+    'category/deleteSubCat',
+    async (data, thunkAPI) => {
+        const {subcat_id} = data
+        const response = await CategoryServices.deleteSubCat(subcat_id)
+        return {
+            response,
+            subcat_id : subcat_id
+        }
+    }
+)
+    
+
+export const editCategory = createAsyncThunk(
+    'category,editCategory',
+    async (data, thunkAPI) => {
+        const {category_id, name, color} = data
+        const res = await CategoryServices.editCategoryInfo(category_id, name, color)
+        return {
+            res,
+            category_id : category_id
+        }
+    }
+)
