@@ -90,10 +90,14 @@ export const categorySlice = createSlice({
     [deleteSubCat.fulfilled] : (state,action) => {
       state.loading = false
       const currentSubCatList = current(state.subCatList)
-      const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
-      state.subCatList = newList
-      if (newList){
+      // Check case chi co duy nhat 1 gia tri thi se return []
+      if (currentSubCatList) {
+        console.log('Co ton tai list')
+        const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
+        state.subCatList = newList
         state.currentSubCat = newList[0].id
+      }else {
+        state.subCatList = []
       }
     }
   }
