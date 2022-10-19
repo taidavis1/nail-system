@@ -1,8 +1,3 @@
-import email
-from enum import unique
-from pyclbr import Function
-from unicodedata import category
-from webbrowser import get
 from flask import Flask , redirect , render_template , jsonify, url_for, request , flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -221,7 +216,8 @@ def get_all_users(current_user):
         output.append({
             'public_id': user.public_id,
             'name' : user.name,
-            'email' : user.email
+            'email' : user.email,
+            'current_user': current_user.email
         })
   
     return jsonify({'users': output})
@@ -231,7 +227,6 @@ def get_all_users(current_user):
 def login():
     # creates dictionary of form data
     auth = request.form
-    print(auth)
     if not auth or not auth.get('email') or not auth.get('password'):
         # returns 401 if any email or / and password is missing
         return make_response(
@@ -336,10 +331,11 @@ def add_category():
         
     return cat_sche.jsonify([cat_add])
 
-
+## function add subcat
+## param request
+## return data 
 @app.route('/Add_Subcat' , methods = ['POST'])
 def add_subcat():
-    
 
     name = request.json['name']
     
@@ -350,8 +346,10 @@ def add_subcat():
     db.session.add(subcat_add)
     
     db.session.commit()
+    
+    cat_add = sub_sche.dump(subcat_add)
         
-    return sub_sche.jsonify([subcat_add])
+    return jsonify(cat_add)
 
 
 @app.route('/Add-photo', methods = ['POST'])
