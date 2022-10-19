@@ -90,15 +90,15 @@ export const categorySlice = createSlice({
     [deleteSubCat.fulfilled] : (state,action) => {
       state.loading = false
       const currentSubCatList = current(state.subCatList)
-      // Check case chi co duy nhat 1 gia tri thi se return []
       if (currentSubCatList) {
-        if (currentSubCatList.length > 1) {
-          console.log('list lon hon 1 gia tri truoc khi xoa')
+        // kiem tra hien tai list co ton tai khong ?
+        if (currentSubCatList.length > 1) { //Check length xem truoc khi xoa list co bao nhieu gia tri
+          // Neu array length > 1 thi co the set lai array khac voi gia tri vua xoa
           const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
           state.subCatList = newList
           state.currentSubCat = newList[0].id
         }else {
-          console.log('list hien tai co 1 gia tri truoc khi xoa')
+          // neu arr chi co 1 gia tri thi sau khi xoa se khong con gia tri nao nua => set lai state = []
           state.subCatList = []
           state.currentSubCat = null
         }
