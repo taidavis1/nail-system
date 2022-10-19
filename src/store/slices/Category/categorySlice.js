@@ -92,12 +92,19 @@ export const categorySlice = createSlice({
       const currentSubCatList = current(state.subCatList)
       // Check case chi co duy nhat 1 gia tri thi se return []
       if (currentSubCatList) {
-        console.log('Co ton tai list')
-        const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
-        state.subCatList = newList
-        state.currentSubCat = newList[0].id
+        if (currentSubCatList.length > 1) {
+          console.log('list lon hon 1 gia tri truoc khi xoa')
+          const newList = currentSubCatList.filter(item => item.id !== action.payload.subcat_id)
+          state.subCatList = newList
+          state.currentSubCat = newList[0].id
+        }else {
+          console.log('list hien tai co 1 gia tri truoc khi xoa')
+          state.subCatList = []
+          state.currentSubCat = null
+        }
       }else {
         state.subCatList = []
+        state.currentSubCat = null
       }
     }
   }
