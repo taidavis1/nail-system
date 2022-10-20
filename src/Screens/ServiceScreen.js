@@ -48,7 +48,6 @@ export default function Servicescreen(props) {
 
 
     useEffect(() => {
-        console.log('subCatNow',currenSubCatID)
         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
     }, [currentCategoryID, isModalVisible,isVisible_EditSubCat, isVisible_SubCat])
 
@@ -103,10 +102,14 @@ export default function Servicescreen(props) {
                                 dispatch(deleteSubCat({subcat_id : currenSubCatID}))
                                 .then(
                                     () => {
-                                        dispatch(fetchsServicesBySubCat({
-                                            categoryID : currentCategoryID,
-                                            subCatID : newSubCatActive.id
-                                        }))
+                                        if (newSubCatActive) {
+                                            dispatch(fetchsServicesBySubCat({
+                                                categoryID : currentCategoryID,
+                                                subCatID : newSubCatActive?.id //Fix 20-10-2022 
+                                            }))
+                                        }else {
+                                            dispatch(resetServiceList())
+                                        }
                                     }
                                 )
                             
