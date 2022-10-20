@@ -45,10 +45,9 @@ export default function Addservicemodal({ onPress, isVisible }) {
     useEffect(() => {
         if (subCatList) {
             const subCatData = subCatList.filter(item => item.id === subCatIDNow)
-            
             setvalueSubCat(subCatData[0])
         }
-    }, [subCatList])
+    }, [subCatIDNow])
     const [valueSubCat, setvalueSubCat] = useState()
     
     // State handle change input

@@ -17,7 +17,6 @@ export const categorySlice = createSlice({
     addCurrentCategoryID: (state,action) => {
       const {id} = action.payload
       state.currentCategory = id
-      state.subCatList = current(state.category).filter(item => item.id === id)[0]?.subCategories
       },
     addCurrentSubCatID : (state,action) => {
       const {id} = action.payload
@@ -42,8 +41,12 @@ export const categorySlice = createSlice({
       if (payload.currentID && currentList) { 
         const currentCatList = currentList.filter(item => item.id === payload.currentID)
         const listSubCat = currentCatList[0].subCategories
-        if (listSubCat) {
+        if (listSubCat.length >=1) {
           state.subCatList = listSubCat
+          state.currentSubCat = listSubCat[0].id
+        }else {
+          state.subCatList = []
+          state.currentSubCat = null
         }
       }
       state.loading = false

@@ -48,8 +48,9 @@ export default function Servicescreen(props) {
 
 
     useEffect(() => {
+        console.log('subCatNow',currenSubCatID)
         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
-    }, [dispatch, isModalVisible, isVisible_Service, isVisible_SubCat,isVisible_EditSubCat])
+    }, [currentCategoryID, isModalVisible,isVisible_EditSubCat, isVisible_SubCat])
 
     // Function handle DeleteCategory :
     const handleDeleteCat = (category) => {
@@ -82,7 +83,6 @@ export default function Servicescreen(props) {
 
     // function handle delete subcat :
     const handleDeleteSubCat = () =>{
-
         if (!currenSubCatID) {
             alert('Must choose a subCat')
         }else{
@@ -99,17 +99,16 @@ export default function Servicescreen(props) {
                     {
                         text: "OK", onPress: () => {
                             const listAfterDelete = SubCatdata.filter(item => item.id !== id)
-                            // const newSubCatActive = listAfterDelete[0]
+                            const newSubCatActive = listAfterDelete[0]
                                 dispatch(deleteSubCat({subcat_id : currenSubCatID}))
-                                // .then(
-                                //     () => {
-                                //         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
-                                //         dispatch(fetchsServicesBySubCat({
-                                //             categoryID : currentCategoryID,
-                                //             subCatID : newSubCatActive.id
-                                //         }))
-                                //     }
-                                // )
+                                .then(
+                                    () => {
+                                        dispatch(fetchsServicesBySubCat({
+                                            categoryID : currentCategoryID,
+                                            subCatID : newSubCatActive.id
+                                        }))
+                                    }
+                                )
                             
                         }
                     }

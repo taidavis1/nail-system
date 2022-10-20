@@ -46,7 +46,6 @@ export const deleteSubCat = createAsyncThunk(
     async (data, thunkAPI) => {
         const {subcat_id} = data
         const response = await CategoryServices.deleteSubCat(subcat_id)
-        console.log(response)
         return {
             response,
             subcat_id : subcat_id

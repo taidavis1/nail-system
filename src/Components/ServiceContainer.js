@@ -5,6 +5,7 @@ import { deleteService, fetchsServicesBySubCat } from '../store/slices/Services/
 import { FlatList } from 'react-native-gesture-handler'
 import Serviceitem from './ServiceItem'
 import Loadingcontent from './LoadingConten'
+import { resetServiceList } from '../store/slices/Services/serviceSlice'
 
 
 
@@ -13,12 +14,14 @@ export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
     const dispatch = useDispatch()
     const currentStateCategory = useSelector(state => state.category.currentCategory)
     const subCatIDNow = useSelector(state => state.category.currentSubCat)
-    // fetch first time render service item (default fetch by Cat)
+    // fetch first time render service item (default fetch by subCat)
     useEffect(() => {
         if (currentStateCategory) {
             dispatch(fetchsServicesBySubCat({categoryID : currentStateCategory,subCatID : subCatIDNow}))
+        }else {
+            dispatch(resetServiceList())
         }
-    }, [currentStateCategory])
+    }, [currentStateCategory,subCatIDNow])
     // hide delete and Edit when close modal 
     useEffect(() => {
         if (onFinishEdit === true) {
@@ -38,7 +41,11 @@ export default function Servicecontainer({ onPress ,onEdit, onFinishEdit}) {
 
     const handleclickItem = (id) => {
         if (id === 'add_service') {
-            onPress()
+            if (subCatIDNow) {
+                onPress()
+            }else {
+                alert('Dont have subCat')
+            }
         }
     }
 
