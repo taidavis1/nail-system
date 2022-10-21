@@ -49,7 +49,7 @@ export default function Servicescreen(props) {
 
     useEffect(() => {
         dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currenSubCatID }))
-    }, [currentCategoryID, isModalVisible,isVisible_EditSubCat, isVisible_SubCat])
+    }, [currentCategoryID, isModalVisible, isVisible_SubCat])
 
     // Function handle DeleteCategory :
     const handleDeleteCat = (category) => {

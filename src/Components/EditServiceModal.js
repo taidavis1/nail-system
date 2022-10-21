@@ -27,7 +27,7 @@ export default function Eidtservicemodal({ onPress, isVisible, editService }) {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if (editService){
+        if (editService && isVisible){
             dispatch(getServiceByID({
                 serviceID : editService?.id
             })).then(

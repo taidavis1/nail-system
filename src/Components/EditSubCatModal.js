@@ -6,12 +6,12 @@ import Forminput from './FormInput';
 import DismissKeyboard from './DismissKeyboard';
 import { useSelector, useDispatch } from 'react-redux';
 import Loadingcontent from './LoadingConten';
-import { editSubCat } from '../store/slices/Category/categoryAction';
+import { editSubCat, fetchCategory } from '../store/slices/Category/categoryAction';
 
 
 export default function EditsubcatModal({ onPress, isVisible }) {
     const [subCatName, setSubCatName] = useState()
-    // const currentCategoryID = useSelector(state => state.category.currentCategory)
+    const currentCategoryID = useSelector(state => state.category.currentCategory)
     const currentSubCatID = useSelector(state => state.category.currentSubCat)
     const subCatList = useSelector(state => state.category.subCatList)
     const currentSubCatData = subCatList.filter(item => item.id === currentSubCatID)
@@ -35,6 +35,7 @@ export default function EditsubcatModal({ onPress, isVisible }) {
                                 name : !subCatName ? currentSubCatData[0]?.name : subCatName
                             })).then(
                                 res => {
+                                    dispatch(fetchCategory({ currentCategoryID: currentCategoryID, currentSubCatID: currentSubCatID }))
                                     onPress()
                                 }
                             )
