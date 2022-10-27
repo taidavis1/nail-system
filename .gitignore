@@ -12,6 +12,8 @@ web-build/
 static/
 static/images
 static/images/*.png
+backend/__pycache__
+backend/__pycache__/*.pyc
 # macOS
 .DS_Store
 .gitignore

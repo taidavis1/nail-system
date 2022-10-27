@@ -1,5 +1,4 @@
-from asyncio import current_task
-from textwrap import wrap
+from flask import Blueprint
 from flask import Flask , redirect , render_template , jsonify, url_for, request , flash, make_response, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -15,154 +14,13 @@ from  werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
+from . import db
+from . import key
+from . import UPLOAD_FOLDER
+from .models import User, Category, Subcat, Services, subcatSchema, servicesSchema, categorySchema
 
-from sqlalchemy import JSON
-# import cv2
+routes = Blueprint('routes', __name__)
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'images')
-
-app = Flask(__name__ , template_folder='templates' , static_folder= 'static')
-
-app.config['SECRET_KEY'] = '$2y$10$HOP85MUzr39.uJcQoGyMOerF0yXU1RuWyYoUcqINGR4A0FILFLSDC'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-marsh = Marshmallow(app)
-
-db = SQLAlchemy(app)
-class User(db.Model):
-    id = db.Column(db.Integer , primary_key = True)
-    
-    public_id = db.Column(db.String(50), unique = True)
-    
-    name = db.Column(db.String(50), unique = True)
-    
-    email = db.Column(db.String(50), unique = True)
-    
-    password  = db.Column(db.String(100), nullable = False)
-    
-    role = db.Column(db.String(100), nullable = False)
-    
-    def __init__ (self,public_id, email, name, password):
-        self.public_id =public_id
-        
-        self.name = name
-        
-        self.email = email
-        
-        self.password = password
-        
-class Subcat(db.Model):
-    
-    id = db.Column(db.Integer , primary_key = True)
-    
-    name = db.Column(db.String(50) , nullable = False)
-        
-    category = db.Column(db.Integer , db.ForeignKey('category.id'))
-    
-    services = db.relationship('Services' , backref = 'sub_services')
-
-    def __init__ (self , name , category):
-        
-        self.name = name
-        
-        self.category = category
-        
-    
-class Category(db.Model):
-    
-    id = db.Column(db.Integer , primary_key = True)
-    
-    category_name = db.Column(db.String(50) , nullable = False)
-    
-    color = db.Column(db.String(50) , nullable = False)
-        
-    services_id = db.relationship('Services' , backref = 'cat_services')
-    
-    subCategories = db.relationship('Subcat' , backref = 'subcat')
-    
-    def __init__ (self , category_name , color):
-        
-        self.category_name = category_name
-        
-        self.color = color
-
-class Services(db.Model):
-    
-    id = db.Column(db.Integer , primary_key = True)
-    
-    name = db.Column(db.String(50) , nullable = False)
-    
-    display_name = db.Column(db.String(50) , nullable = False)
-    
-    name = db.Column(db.String(50) , nullable = False)
-
-    price = db.Column(db.Integer , nullable = False)
-    
-    commision = db.Column(db.String(50) , nullable = False)
-    
-    color = db.Column(db.String(50) , nullable = False)
-
-    photo = db.Column(db.String(150) , nullable = False)
-
-    category = db.Column(db.Integer , db.ForeignKey('category.id'))
-    
-    subCategories = db.Column(db.Integer , db.ForeignKey('subcat.id'))
-    
-    def __init__ (self , name, display_name , price , commision , color , photo , category , subCategories):
-        
-        self.name = name
-        
-        self.display_name = display_name 
-        
-        self.price = price
-        
-        self.commision = commision
-        
-        self.color = color
-        
-        self.photo = photo
-        
-        self.category = category
-        
-        self.subCategories = subCategories
-        
-class subcatSchema(marsh.SQLAlchemyAutoSchema):
-    
-    class Meta:
-        
-        model = Subcat
-        
-        load_instance = True
-                
-class servicesSchema(marsh.SQLAlchemyAutoSchema):
-    
-    class Meta:
-        
-        model = Services
-        
-        load_instance = True
-
-                        
-class categorySchema(marsh.SQLAlchemyAutoSchema):
-    
-    subCategories = marsh.Nested(subcatSchema , many = True)
-    
-    services = marsh.Nested(servicesSchema , many = True)
-    
-    class Meta:
-        
-        model = Category
-        
-        load_instance = True
-
-        
 cat_sche = categorySchema()
 
 cats_sche = categorySchema(many = True)
@@ -190,7 +48,7 @@ def token_required(f):
   
         try:
             # decoding the payload to fetch the stored details
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            data = jwt.decode(token, key, algorithms=['HS256'])
             current_user = User.query\
                 .filter_by(public_id = data['public_id'])\
                 .first()
@@ -205,7 +63,7 @@ def token_required(f):
 
 # User Database Route
 # this route sends back list of users
-@app.route('/user', methods =['GET'])
+@routes.route('/user', methods =['GET'])
 @token_required
 def get_all_users(current_user):
     # querying the database
@@ -227,7 +85,7 @@ def get_all_users(current_user):
     return jsonify({'users': output})
 
 # route for logging user in
-@app.route('/login', methods =['POST'])
+@routes.route('/login', methods =['POST'])
 def login():
     # creates dictionary of form data
     auth = request.form
@@ -253,11 +111,11 @@ def login():
         token = jwt.encode({
             'public_id': user.public_id,
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
-        }, app.config['SECRET_KEY'])
+        }, key)
         role = jwt.encode({
             'role': user.role, 
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
-        }, app.config['SECRET_KEY'])
+        }, key)
         
         return make_response(jsonify({'token' : token, 'user_role': role}), 201)
     # returns 403 if password is wrong
@@ -268,7 +126,7 @@ def login():
     )
     
 # signup route
-@app.route('/signup', methods =['POST'])
+@routes.route('/signup', methods =['POST'])
 def signup():
 
     data = request.form
@@ -278,9 +136,8 @@ def signup():
     # gets name, email and password
     name, email = data.get('name'), data.get('email')
     password = data.get('password')
-    
-    # return jsonify(data)
-  
+    role = data.get('role')
+
     # checking for existing user
     user = User.query\
         .filter_by(email = email)\
@@ -291,7 +148,8 @@ def signup():
             public_id = str(uuid.uuid4()),
             name = name,
             email = email,
-            password = generate_password_hash(password)
+            password = generate_password_hash(password),
+            role = role
         )
         # insert user
         db.session.add(user)
@@ -304,20 +162,19 @@ def signup():
 
 ### GET ALL DATE FROM DB ###
 ### RETURN DATA ###
-@app.route('/get_data' , methods = ['GET'])
-@token_required
-def get_data(current_user):
+@routes.route('/get_data' , methods = ['GET'])
+def get_data():
     
     category_list = Category.query.all()
             
     all_data = cats_sche.dump(category_list)
     
-    all_data.append({'current_user' : current_user.email}) 
+    # all_data.append({'current_user' : current_user.email}) 
         
     return jsonify(all_data)
 
 
-@app.route('/get_all_services' , methods = ['GET'])
+@routes.route('/get_all_services' , methods = ['GET'])
 def get_services():
                 
     category_list = Services.query.all()
@@ -327,7 +184,7 @@ def get_services():
     return jsonify(all_data)
 
 
-@app.route('/Add_Category' , methods = ['POST'])
+@routes.route('/Add_Category' , methods = ['POST'])
 def add_category():
     
     category_name = request.json['name']
@@ -345,13 +202,17 @@ def add_category():
 ## function add subcat
 ## param request
 ## return data 
-@app.route('/Add_Subcat' , methods = ['POST'])
+@routes.route('/Add_Subcat' , methods = ['POST'])
 @token_required
 def add_subcat(current_user):
 
     user_role = current_user.role
     
-    if user_role == 1 or user_role == 2:
+    print(user_role)
+    
+    print(type(user_role))
+    
+    if user_role == '1' or user_role == '2':
         name = request.json['name']
         
         id = request.json['category']
@@ -369,8 +230,7 @@ def add_subcat(current_user):
         return jsonify('No Permission Method')
 
 
-@app.route('/Add-photo', methods = ['POST'])
-
+@routes.route('/Add-photo', methods = ['POST'])
 def addPhoto():
     
     display_name = request.form.get('display_name')
@@ -403,8 +263,7 @@ def addPhoto():
 
 
 ######## ADD IMAGE TO DATABASE FROM FE
-@app.route('/Add_Services' , methods = ['POST'])
-
+@routes.route('/Add_Services' , methods = ['POST'])
 def add_services():
     
     display_name = request.form.get('displayName')
@@ -427,7 +286,7 @@ def add_services():
     
     # user_check = user_check.name
     
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], name + ".png")
+    image_path = os.path.join(UPLOAD_FOLDER, name + ".png")
     
     photo.save(image_path)
 
@@ -458,7 +317,7 @@ def add_services():
 # Function get serive by category_id
 # Param Request 
 # Return data
-@app.route('/get_services_by_category/<int:category>' , methods = ['POST'])
+@routes.route('/get_services_by_category/<int:category>' , methods = ['POST'])
 def get_services_by_category(category):
                 
     # category_list = Services.query.all()
@@ -473,7 +332,7 @@ def get_services_by_category(category):
 # Function get serive by service_id
 # Param Request 
 # Return data
-@app.route('/get_services_by_id' , methods = ['POST'])
+@routes.route('/get_services_by_id' , methods = ['POST'])
 def get_services_by_id():
     
     id = request.json['service_id']
@@ -494,7 +353,7 @@ def get_services_by_id():
 # Function get serive by subcat_id
 # Param Request 
 # Return data
-@app.route('/get_services_by_subcat/<int:category>/<int:subcat>' , methods = ['POST'])
+@routes.route('/get_services_by_subcat/<int:category>/<int:subcat>' , methods = ['POST'])
 def get_services_by_subcat(category, subcat):
                 
     # category_list = Services.query.all()
@@ -511,7 +370,7 @@ def get_services_by_subcat(category, subcat):
 # Function Delete Services by service_id
 # Params Request 
 # Return json message
-@app.route('/delete_service', methods = ['POST'])
+@routes.route('/delete_service', methods = ['POST'])
 def delete_service():
     
     service_id = request.json['service_id']
@@ -530,7 +389,7 @@ def delete_service():
         return jsonify('successfully delete service')
 
 
-@app.route('/delete_subcat', methods = ['POST'])
+@routes.route('/delete_subcat', methods = ['POST'])
 def delete_subcat():
     
     id = request.json['subcat_id']
@@ -558,7 +417,7 @@ def delete_subcat():
         return jsonify('deleted subcat sucessfully')
 
 
-@app.route('/delete_category', methods = ['POST'])
+@routes.route('/delete_category', methods = ['POST'])
 def delete_category(): #fix khong truyen id vao vi da lay truc tiep json tu req
     
     category_id = request.json['category_id']
@@ -589,7 +448,7 @@ def delete_category(): #fix khong truyen id vao vi da lay truc tiep json tu req
 # Function delete services by subcat_id 
 # Params int + int 
 # Return json message
-@app.route('/delete_service_by_subcat_id/<int:category_id>/<int:subcat_id>', methods = ['GET'])
+@routes.route('/delete_service_by_subcat_id/<int:category_id>/<int:subcat_id>', methods = ['GET'])
 def delete_services_by_subcat(category_id, subcat_id):
     
     items = Services.query.filter_by(category = category_id, subCategories = subcat_id).all()
@@ -603,7 +462,7 @@ def delete_services_by_subcat(category_id, subcat_id):
 # Function Edit Category Info
 # Params Request 
 # Return data 
-@app.route('/edit_category_info',methods = ['POST']) #Tuong111 bo sung route de update cat info
+@routes.route('/edit_category_info',methods = ['POST']) #Tuong111 bo sung route de update cat info
 def edit_category():
 
     category_id = request.json['category_id']
@@ -630,7 +489,7 @@ def edit_category():
 # Function Edit SubCat Info
 # Params Request 
 # Return data 
-@app.route('/edit_subcat_info',methods = ['POST']) #Tuong111 bo sung route de update subcat info
+@routes.route('/edit_subcat_info',methods = ['POST']) #Tuong111 bo sung route de update subcat info
 def edit_subCat():
 
     subcat_id = request.json['subcat_id']
@@ -655,7 +514,7 @@ def edit_subCat():
 # Function Edit Services
 # Params Request 
 # Return data 
-@app.route('/edit_service_infor', methods = ['POST'])
+@routes.route('/edit_service_infor', methods = ['POST'])
 def edit_services():
     
     # category_id = request.form.get('category_id') -- Khong can dung den catID nua
@@ -701,9 +560,5 @@ def edit_services():
     
     return services_sche.jsonify([item])
 
-            
-####################################################
 
-if __name__ == '__main__':
-    
-    app.run(host='127.0.0.1',port=5000 , debug = True)
+
