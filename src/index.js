@@ -5,6 +5,9 @@ import { NavigationContainer } from '@react-navigation/native'
 import Appdrawer from './Drawer/AppDrawer';
 import { Provider } from 'react-redux';
 import {store} from './store';
+import Loginscreen from './Screens/LoginScreen';
+import FlashMessage from "react-native-flash-message";
+import Appnavigation from './Navigations/AppNavigation';
 
 const theme = createTheme({
     components: {
@@ -27,7 +30,9 @@ export default function Main(props) {
             <NavigationContainer>
                 <SafeAreaProvider>
                     <ThemeProvider theme={theme}>
-                        <Appdrawer/>
+                        {/* <Loginscreen/> */}
+                        <Appnavigation/>
+                        <FlashMessage position="top" />
                     </ThemeProvider>
                 </SafeAreaProvider>
             </NavigationContainer>

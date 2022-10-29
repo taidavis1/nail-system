@@ -1,13 +1,16 @@
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 import { LinearGradient } from 'expo-linear-gradient'
 import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, View } from 'react-native'
 import LogoNailsSys from '../../assets/icons/LogoNailsSys';
 import Ionicon from '@expo/vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { logOut } from '../store/slices/auth/authSlice';
 export default function Drawercontent(props) {
     const navigation = useNavigation()
     const [active, setactive] = useState('Services')
+    const dispatch = useDispatch()
 
     return (
         <View style={styles.container}>
@@ -71,6 +74,35 @@ export default function Drawercontent(props) {
                     }}
                     activeTintColor='#40407a'
                 />
+                <DrawerItem
+                    focused={active === 'LogOut' ? true : false}
+                    style={{
+                        backgroundColor: '#fab1a0'
+                    }}
+                    label={'Log Out'}
+                    icon={({ size, color }) => (<Ionicon name='arrow-forward-circle-outline' size={size} color={color} />)}
+                    onPress={() => {
+                        Alert.alert(
+                            "Sure ?",
+                            "Do you wanna Log Out",
+                            [
+                                {
+                                    text: "Cancel",
+                                    style: "cancel"
+                                },
+                                {
+                                    text: "OK", 
+                                    onPress: () => {
+                                        // setactive('LogOut')
+                                        dispatch(logOut())
+                                    },
+                                    style : 'destructive'
+                                }
+                            ]
+                        );
+                    }}
+                    activeTintColor='#40407a'
+                />
 
             </DrawerContentScrollView>
             <View style={styles.closeDrawer}>
@@ -112,12 +144,12 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20
 
     },
-    closeDrawer : {
-        width : '100%',
-        backgroundColor : '#33d9b2',
-        height : 50,
-        justifyContent : 'center',
-        alignItems : 'center'
+    closeDrawer: {
+        width: '100%',
+        backgroundColor: '#33d9b2',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
 

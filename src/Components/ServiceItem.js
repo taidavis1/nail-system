@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Text, View , TouchableOpacity, StyleSheet , Image, Dimensions, Touchable} from 'react-native'
 import Ionicon from '@expo/vector-icons/Ionicons'
 import { baseURL } from '../Services/index';
-import COLORS from '../Constant/color';
+import COLORS from '../Constant/colors';
 
 const height = Dimensions.get('screen').height - 100
 const width = Dimensions.get('screen').width * 0.75 - 60

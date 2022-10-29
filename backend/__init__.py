@@ -26,7 +26,7 @@ def create_app():
 
     app.config['SECRET_KEY'] = key
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:duykhanh12345@localhost/test_nails'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:tuong123@localhost:49415/nailsapp'
 
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
