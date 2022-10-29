@@ -117,7 +117,7 @@ def login():
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
         }, key)
         
-        return make_response(jsonify({'token' : token, 'message': 'Login successfully'}), 201)
+        return make_response(jsonify({'token' : token, 'message': 'Login successfully','role' : user.role}), 201)
     # returns 403 if password is wrong
     return make_response(
         'Could not verify',

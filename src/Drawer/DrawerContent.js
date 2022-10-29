@@ -5,13 +5,13 @@ import { Alert, StyleSheet, Text, View } from 'react-native'
 import LogoNailsSys from '../../assets/icons/LogoNailsSys';
 import Ionicon from '@expo/vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from '../store/slices/auth/authSlice';
 export default function Drawercontent(props) {
     const navigation = useNavigation()
     const [active, setactive] = useState('Services')
     const dispatch = useDispatch()
-
+    const role = useSelector(state => state.auth.role)
     return (
         <View style={styles.container}>
             <LinearGradient
@@ -44,7 +44,8 @@ export default function Drawercontent(props) {
                     }}
                     activeTintColor='#40407a'
                 />
-                <DrawerItem
+                {
+                    role === '1' && <DrawerItem
                     focused={active === 'Employees' ? true : false}
                     label={'Employees'}
                     icon={({ size, color }) => (<Ionicon name='people-outline' size={size} color={color} />)}
@@ -54,6 +55,8 @@ export default function Drawercontent(props) {
                     }}
                     activeTintColor='#40407a'
                 />
+                }
+                
                 <DrawerItem
                     focused={active === 'Inventory' ? true : false}
                     label={'Inventory'}
@@ -64,7 +67,8 @@ export default function Drawercontent(props) {
                     }}
                     activeTintColor='#40407a'
                 />
-                <DrawerItem
+                {
+                    role === '1' &&  <DrawerItem
                     focused={active === 'Settings' ? true : false}
                     label={'Settings'}
                     icon={({ size, color }) => (<Ionicon name='settings-outline' size={size} color={color} />)}
@@ -74,6 +78,8 @@ export default function Drawercontent(props) {
                     }}
                     activeTintColor='#40407a'
                 />
+                }
+
                 <DrawerItem
                     focused={active === 'LogOut' ? true : false}
                     style={{

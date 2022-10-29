@@ -6,12 +6,14 @@ const authSlice = createSlice({
     initialState : {
         loading : false,
         token : null,
-        isLogin : false
+        isLogin : false,
+        role : null
     },
     reducers : {
         logOut : (state) => {
             state.token = null
             state.isLogin = false
+            state.role = null
         }
     },
     extraReducers : {
@@ -22,6 +24,7 @@ const authSlice = createSlice({
             state.loading = false
             state.token = action.payload.token
             state.isLogin = true
+            state.role = action.payload.role
         },
         [userLogin.rejected] : (state) => {
             state.loading = false
