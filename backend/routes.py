@@ -137,6 +137,7 @@ def signup():
     name, email = data.get('name'), data.get('email')
     password = data.get('password')
     role = data.get('role')
+    role_id = data.get('role_id')
 
     # checking for existing user
     user = User.query\
@@ -149,7 +150,10 @@ def signup():
             name = name,
             email = email,
             password = generate_password_hash(password),
-            role = role
+            role = role,
+            role_id = role_id,
+            staff_id = 1,
+            status = 1,
         )
         # insert user
         db.session.add(user)
